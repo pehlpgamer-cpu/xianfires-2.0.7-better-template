@@ -1,11 +1,11 @@
-import path from 'path';
-import fs from 'fs/promises';
-import { toPascalCase, ensureDir } from "../utils.js"
-import { licenseComment } from "../constants.js"
+import path from "path";
+import fs from "fs/promises";
+import { toPascalCase, ensureDir } from "../utils.js";
+import { licenseComment } from "../constants.js";
 
 // Generate Model (Sequelize for MySQL, Mongoose for MongoDB, Firestore helpers for Firebase)
 export const createModel = async (modelName) => {
-  const modelDir = path.join(process.cwd(), 'models');
+  const modelDir = path.join(process.cwd(), "models");
   await ensureDir(modelDir);
 
   const pascalName = toPascalCase(modelName);

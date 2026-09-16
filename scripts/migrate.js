@@ -1,4 +1,3 @@
-
 import { Sequelize } from "sequelize";
 import { sequelize } from "../models/db.js";
 import { User } from "../models/userModel.js";

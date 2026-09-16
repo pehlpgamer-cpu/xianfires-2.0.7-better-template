@@ -40,10 +40,10 @@ const routes = [];
 const walk = (stack, prefix = "") => {
   for (const layer of stack) {
     if (layer.route) {
-      const methods = Object.keys(layer.route.methods).map(m => m.toUpperCase());
+      const methods = Object.keys(layer.route.methods).map((m) => m.toUpperCase());
       const fullPath = prefix + layer.route.path;
       const handler = layer.route.stack
-        .map(s => (s.handle && s.handle.name) || "anonymous")
+        .map((s) => (s.handle && s.handle.name) || "anonymous")
         .join(" → ");
       routes.push({ methods: methods.join(", "), path: fullPath, handler });
     } else if (layer.name === "router" && layer.handle && layer.handle.stack) {
@@ -68,8 +68,8 @@ console.log("╠═════════════════════�
 if (routes.length === 0) {
   console.log("║  (no routes found)                                               ║");
 } else {
-  const methodWidth = Math.max(...routes.map(r => r.methods.length), 7);
-  const pathWidth = Math.max(...routes.map(r => r.path.length), 4);
+  const methodWidth = Math.max(...routes.map((r) => r.methods.length), 7);
+  const pathWidth = Math.max(...routes.map((r) => r.path.length), 4);
 
   routes.forEach((r, i) => {
     const line = String(i + 1).padStart(3);

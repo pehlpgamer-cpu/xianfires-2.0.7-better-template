@@ -1,5 +1,4 @@
-export const licenseComment = 
-`
+export const licenseComment = `
 /*
     MIT License
     
@@ -24,4 +23,4 @@ export const licenseComment =
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
-`
+`;

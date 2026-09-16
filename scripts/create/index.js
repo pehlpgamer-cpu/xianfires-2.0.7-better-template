@@ -1,7 +1,5 @@
-
-import {createController} from "./controller.js"
-import {createModel} from "./model.js"
-
+import { createController } from "./controller.js";
+import { createModel } from "./model.js";
 
 const args = process.argv.slice(2);
 
@@ -28,18 +26,14 @@ const name = args[1]; // e.g., 'User' or 'userController'
 // Run based on type
 (async () => {
   try {
-    if (type === 'model') await createModel(name);
-    else if (type === 'controller') await createController(name);
+    if (type === "model") await createModel(name);
+    else if (type === "controller") await createController(name);
     else {
       console.error('❌ Unknown type. Use "model" or "controller".');
       process.exit(1);
     }
-  } 
-  catch (err) {
-    console.error('❌ Error:', err.message);
+  } catch (err) {
+    console.error("❌ Error:", err.message);
     process.exit(1);
   }
 })();
-
-
-

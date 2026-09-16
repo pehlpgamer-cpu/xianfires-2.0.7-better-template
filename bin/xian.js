@@ -39,19 +39,19 @@ const rest = args.slice(1);
 // Map short aliases to full script names
 const aliases = {
   "": "start",
-  "s": "start",
-  "start": "start",
-  "d": "dev",
-  "dev": "dev",
-  "m": "migrate",
-  "migrate": "migrate",
-  "t": "test",
-  "test": "test",
-  "b": "build",
-  "build": "build",
-  "r": "run",
-  "run": "run",
-  "dist": "dist",
+  s: "start",
+  start: "start",
+  d: "dev",
+  dev: "dev",
+  m: "migrate",
+  migrate: "migrate",
+  t: "test",
+  test: "test",
+  b: "build",
+  build: "build",
+  r: "run",
+  run: "run",
+  dist: "dist",
 };
 
 const script = aliases[command] || command;

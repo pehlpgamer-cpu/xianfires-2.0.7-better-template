@@ -22,13 +22,13 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
     */
-    
+
 import express from "express";
 import path from "path";
 import session from "express-session";
 import flash from "connect-flash";
 import router from "./routes/index.js";
-import fs from 'fs';
+import fs from "fs";
 import hbs from "hbs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -43,17 +43,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(), "public")));
 
-app.use(session({
-  secret: "xianfire-secret-key",
-  resave: false,
-  saveUninitialized: false
-}));
+app.use(
+  session({
+    secret: "xianfire-secret-key",
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 app.use(flash());
 
 app.engine("xian", async (filePath, options, callback) => {
   try {
-     const originalPartialsDir = hbs.partialsDir;
-    hbs.partialsDir = path.join(__dirname, 'views');
+    const originalPartialsDir = hbs.partialsDir;
+    hbs.partialsDir = path.join(__dirname, "views");
 
     const result = await new Promise((resolve, reject) => {
       hbs.__express(filePath, options, (err, html) => {
@@ -74,7 +76,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "xian");
 const partialsDir = path.join(__dirname, "views/partials");
@@ -84,19 +85,18 @@ fs.readdir(partialsDir, (err, files) => {
     return;
   }
 
-   files
-    .filter(file => file.endsWith('.xian'))
-    .forEach(file => {
-      const partialName = file.replace('.xian', ''); 
+  files
+    .filter((file) => file.endsWith(".xian"))
+    .forEach((file) => {
+      const partialName = file.replace(".xian", "");
       const fullPath = path.join(partialsDir, file);
 
-      fs.readFile(fullPath, 'utf8', (err, content) => {
+      fs.readFile(fullPath, "utf8", (err, content) => {
         if (err) {
           console.error(`❌ Failed to read partial: ${file}`, err);
           return;
         }
         hbs.registerPartial(partialName, content);
-        
       });
     });
 });

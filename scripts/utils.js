@@ -1,12 +1,12 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 // PascalCase for model names
 export const toPascalCase = (str) => {
   return str
-    .replace(/[^a-zA-Z0-9]/g, ' ')
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join('');
+    .replace(/[^a-zA-Z0-9]/g, " ")
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join("");
 };
 
 // camelCase for controller names
@@ -23,6 +23,3 @@ export const ensureDir = async (dir) => {
     await fs.mkdir(dir, { recursive: true });
   }
 };
-
-
-

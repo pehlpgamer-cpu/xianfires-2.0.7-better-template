@@ -1,15 +1,15 @@
-import path from 'path';
-import fs from 'fs/promises';
-import { toCamelCase, toPascalCase, ensureDir } from "../utils.js"
-import { licenseComment } from "../constants.js"
+import path from "path";
+import fs from "fs/promises";
+import { toCamelCase, toPascalCase, ensureDir } from "../utils.js";
+import { licenseComment } from "../constants.js";
 
 // Generate Express Controller (named exports)
 export const createController = async (controllerName) => {
-  const controllerDir = path.join(process.cwd(), 'controllers');
+  const controllerDir = path.join(process.cwd(), "controllers");
   await ensureDir(controllerDir);
 
   const camelName = toCamelCase(controllerName); // e.g., userController
-  const pascalModelName = toPascalCase(camelName.replace(/controller$/, '')); // e.g., User
+  const pascalModelName = toPascalCase(camelName.replace(/controller$/, "")); // e.g., User
   const controllerPath = path.join(controllerDir, `${camelName}.js`);
 
   const controllerContent = `
