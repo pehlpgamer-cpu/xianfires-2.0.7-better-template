@@ -32,7 +32,7 @@ SOFTWARE.
 import express from "express";
 
 const app = express();
-const router = (await import("./routes/index.js")).default;
+const router = (await import("../routes/index.js")).default;
 app.use("/", router);
 
 const routes = [];

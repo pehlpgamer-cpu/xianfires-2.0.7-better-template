@@ -15,13 +15,17 @@ configure({
       files: ['tests/browser/**/*.spec.js'],
     },
     {
+      name: 'feature',
+      files: ['tests/feature/**/*.spec.js'],
+    },
+    {
       name: 'unit',
       files: ['tests/unit/**/*.spec.js'],
     }
   ],
   plugins: [
     expect(),
-    apiClient('http://localhost:3333'),
+    apiClient('http://localhost:3000'),
     // fileSystem(),
     expectTypeOf(),
     snapshot(),

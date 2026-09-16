@@ -13,8 +13,8 @@
     "migrate": "node ./scripts/migrate.js",
     "create:model": "node ./scripts/create/index.js model",
     "create:controller": "node ./scripts/create/index.js controller",
-    "route:list": "node list-routes.js",
-    "route:cache": "node route-cache.js",
+    "route:list": "node ./scripts/list-routes.js",
+    "route:cache": "node ./scripts/route-cache.js",
     "test": "node bin/test.js",
     "electron": "electron .",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
@@ -38,6 +38,7 @@
     "lucide": "^1.46.0",
     "mysql2": "^3.9.2",
     "sequelize": "^6.37.3",
+    "uuid": "^14.0.2",
     "zod": "^4.6.5"
   },
   "devDependencies": {

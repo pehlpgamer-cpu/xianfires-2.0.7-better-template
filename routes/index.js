@@ -10,15 +10,15 @@ router.get("/forgot-password/view", authController.forgotPasswordView);
 router.get("/dashboard/view", authController.dashboardView);
 router.get("/login/view", authController.loginView);
 
-router.post("/login", authController.loginUser);
-router.post("/register", authController.registerUser);
-router.get("/logout", authController.logoutUser);
+router.post("/login", authController.login);
+router.post("/register", authController.register);
+router.get("/logout", authController.logout);
 
 import { productController } from "../controllers/productController.js";
 
 router.get("/products/:id", productController.show);
 router.get("/products", productController.index);
-router.get("/products", productController.store);
+router.post("/products", productController.store);
 
 //! WIP...
 // import { routeBuilder, route } from "../utils/routing.js"

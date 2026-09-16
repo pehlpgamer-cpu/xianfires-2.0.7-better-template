@@ -1,5 +1,9 @@
-import bcrypt from "bcrypt";
+import * as argon2 from "argon2";
+import { v4 as uuidv4 } from 'uuid';
+import { argon2Config } from "../configs/argon2Config.js"
 import { User, sequelize } from "../models/userModel.js";
+import { loginRequest } from "../requests/auth/loginRequest.js"
+import { registerRequest } from "../requests/auth/loginRequest.js"
 await sequelize.sync();
 
 export const authController = {
@@ -12,35 +16,36 @@ export const authController = {
     res.render("dashboard", { title: "Dashboard" });
   },
 
-  loginUser: async (req, res) => {
-    const data = {
-      email: req.body.email,
-      password: req.body.password,
-    };
+  login: async (req, res) => {
+    const { email } = loginRequest(req)
 
-    const Login = z.object({
-      email: z.string(),
-      password: z.string(),
-    });
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.send("User not found");
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.send("Incorrect password");
 
-    try {
-      Player.parse({ username: 42, xp: "100" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.json(error.issues);
-      }
-    }
-  },
-
-  registerUser: async (req, res) => {
-    const { name, email, password } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed });
     req.session.userId = user.id;
     res.redirect("/dashboard");
   },
 
-  logoutUser: (req, res) => {
+  register: async (req, res) => {
+    const validData = registerRequest(req)
+
+    const salt = uuidv4()
+    const pepper = process.env.APP_SECRET
+    const hashPassword = await argon2.hash(password + salt + pepper, argon2Config);
+
+    const user = await User.create({ 
+      name: validData.name, 
+      email: validData.email, 
+      password: hashPassword,
+      salt: salt
+    });
+    req.session.userId = user.id;
+    res.redirect("/dashboard");
+  },
+
+  logout: (req, res) => {
     req.session.destroy();
     res.redirect("/login");
   },
