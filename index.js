@@ -118,3 +118,4 @@ export default app;
 if (!process.env.ELECTRON) {
   app.listen(PORT, () => console.log(`🔥 XianFire running at http://localhost:${PORT}`));
 }
+

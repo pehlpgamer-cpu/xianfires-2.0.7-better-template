@@ -1,7 +1,7 @@
 
 import { sequelize } from "../app/models/db.js";
 import inquirer from "inquirer";
-import { mysqlConfig, defaultConfig } from "../configs/database.js";
+import { mysqlConfig, defaultConfig } from "../config/database.js";
 
 const rootSequelize = mysqlConfig;
 let dbName = null;
