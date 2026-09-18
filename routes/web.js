@@ -1,9 +1,9 @@
 import express from "express";
-import { homePage } from "../controllers/homeController.js";
+import { homePage } from "../app/http/controllers/homeController.js";
 const router = express.Router();
 router.get("/", homePage);
 
-import { authController } from "../controllers/authController.js";
+import { authController } from "../app/http/controllers/authController.js";
 
 router.get("/register/view", authController.registerView);
 router.get("/forgot-password/view", authController.forgotPasswordView);
@@ -14,7 +14,7 @@ router.post("/login", authController.login);
 router.post("/register", authController.register);
 router.get("/logout", authController.logout);
 
-import { productController } from "../controllers/productController.js";
+import { productController } from "../app/http/controllers/productController.js";
 
 router.get("/products/:id", productController.show);
 router.get("/products", productController.index);

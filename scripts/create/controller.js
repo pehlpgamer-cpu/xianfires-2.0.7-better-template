@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import { toCamelCase, toPascalCase, ensureDir } from "../utils.js";
-import { licenseComment } from "../constants.js";
+
 
 // Generate Express Controller (named exports)
 export const createController = async (controllerName) => {
@@ -13,7 +13,6 @@ export const createController = async (controllerName) => {
   const controllerPath = path.join(controllerDir, `${camelName}.js`);
 
   const controllerContent = `
-${licenseComment}
 import { ${pascalModelName}, sequelize } from "../models/${pascalModelName}.js";
 await sequelize.sync();
 const ${camelName} ={

@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import { toPascalCase, ensureDir } from "../utils.js";
-import { licenseComment } from "../constants.js";
+
 
 // Generate Model (Sequelize for MySQL, Mongoose for MongoDB, Firestore helpers for Firebase)
 export const createModel = async (modelName) => {
@@ -12,7 +12,7 @@ export const createModel = async (modelName) => {
   const modelPath = path.join(modelDir, `${pascalName}.js`);
 
   let modelContent = `
-  ${licenseComment}
+
   // Firebase doesn't require predefined models.
   // Use Firestore directly in controllers or create helper functions here.
   // Collection name: "${pascalName.toLowerCase()}"

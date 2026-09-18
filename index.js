@@ -27,7 +27,7 @@ import express from "express";
 import path from "path";
 import session from "express-session";
 import flash from "connect-flash";
-import router from "./routes/index.js";
+
 import fs from "fs";
 import hbs from "hbs";
 import { fileURLToPath } from "url";
@@ -45,7 +45,7 @@ app.use(express.static(path.join(process.cwd(), "public")));
 
 app.use(
   session({
-    secret: "xianfire-secret-key",
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
   }),
@@ -76,9 +76,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.set("views", path.join(__dirname, "views"));
+const viewDir = {
+  pages: "views/pages",
+  partials: "views/partials"
+}
+
+app.set("views", path.join(__dirname, viewDir.pages));
 app.set("view engine", "xian");
-const partialsDir = path.join(__dirname, "views/partials");
+const partialsDir = path.join(__dirname, viewDir.partials);
+
 fs.readdir(partialsDir, (err, files) => {
   if (err) {
     console.error("❌ Could not read partials directory:", err);
@@ -101,7 +107,11 @@ fs.readdir(partialsDir, (err, files) => {
     });
 });
 
-app.use("/", router);
+import web_router from "./routes/web.js";
+import api_v1_router from "./routes/api_v1.js"
+
+app.use("/", web_router);
+app.use("/api/v1", api_v1_router);
 
 export default app;
 
