@@ -3,7 +3,8 @@ import { sequelize } from "../database/database.js";
 
 // 🚨 CRITICAL: Import your models so they execute and register!
 import "../app/models/Product.js"; 
-// import "../app/models/User.js"; // Add other models here
+import "../app/models/User.js"; 
+
 
 // Helper function to create the database if it doesn't exist
 async function ensureDatabaseExists() {
@@ -26,16 +27,15 @@ try {
   console.log("⏳ Checking if database exists...");
   await ensureDatabaseExists();
 
-  const db = sequelize()
   // Verify connection using the shared instance
-  await db.authenticate();
+  await sequelize.authenticate();
   console.log("✅ Connected to MySQL database!");
 
   // Verify models are registered
-  console.log("Registered models:", Object.keys(db.models)); 
+  console.log("Registered models:", Object.keys(sequelize.models)); 
 
   // Sync tables
-  await db.sync({ force: true }); 
+  await sequelize.sync({ force: true }); 
   console.log("✅ Tables created for all models!");
 
 } catch (err) {

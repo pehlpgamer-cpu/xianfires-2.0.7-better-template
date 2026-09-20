@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize";
 import { production } from '../config/database.js';
 import 'dotenv/config'
-export const sequelize = () => {
+
+
+const sql_env = () => {
     if (process.env.ENV === 'development') {
         // Constructor signature is: (database, username, password, options)
         return new Sequelize(
@@ -30,3 +32,5 @@ export const sequelize = () => {
     
     throw new Error("ENV variable must be set to 'development' or 'production'");
 };
+
+export const sequelize = sql_env()
