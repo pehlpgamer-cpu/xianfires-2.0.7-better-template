@@ -5,7 +5,7 @@ import * as z from "zod";
  */
 export const storeProductRequest = (req) =>
 {
-    const req_data = {
+    const data = {
         name: req.body.name.trim(),
         description: req.body.description,
         price: req.body.price,
@@ -19,8 +19,8 @@ export const storeProductRequest = (req) =>
     });
 
     try {
-        Product.parse(req_data);
-        return req_data;
+        Product.parse(data);
+        return data;
     } catch (error) {
         if (error instanceof z.ZodError) return error.issues;
     }

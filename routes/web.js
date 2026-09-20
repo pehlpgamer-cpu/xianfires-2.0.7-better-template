@@ -20,18 +20,5 @@ router.get("/products/:id", productController.show);
 router.get("/products", productController.index);
 router.post("/products", productController.store);
 
-//! WIP...
-// import { routeBuilder, route } from "../utils/routing.js"
-// routeBuilder(router, [{
-//         prefix: "/products",
-//         controller: productController,
-//         r: [
-//             route("get", "/:id", "show"),
-//             route("get", "", "index"),
-//             route("post", "", "store")
-//         ],
-//     }
-
-// ]);
 
 export default router;

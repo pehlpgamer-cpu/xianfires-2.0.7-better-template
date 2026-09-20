@@ -1,17 +1,14 @@
-import * as z from "zod";
+
 import { storeProductRequest } from "../requests/product/storeProductRequest.js"
 import { updateProductRequest } from "../requests/product/updateProductRequest.js"
 import { getProductRequest } from "../requests/product/getProductRequest.js"
+import { singleResourceRequest } from "../requests/singleResourceRequest.js";
+
+import { Product } from "../../models/Product.js";
 export const productController = {
   show: async (req, res) => {
-    const Product = z.object({id: z.int()});
-    try {
-      Product.parse({id: req.params.id});
-
-      res.json({}).status(200)
-    } catch (error) {
-      if (error instanceof z.ZodError) res.json(error.issues).status(404);
-    }
+    const validData = singleResourceRequest(req)
+    
   },
 
   index: (req, res) => {
@@ -20,8 +17,14 @@ export const productController = {
   },
 
   store: async (req, res) => {
-    const result = storeProductRequest(req)
-    res.json(result)
+    const data = storeProductRequest(req)
+    const product = Product.create({
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      stock: data.stock
+    })
+    res.json({id: product.id}).status(201)
   },
 
   //view

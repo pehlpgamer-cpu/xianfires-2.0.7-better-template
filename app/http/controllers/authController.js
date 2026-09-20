@@ -1,10 +1,10 @@
 import * as argon2 from "argon2";
 import { v4 as uuidv4 } from 'uuid';
 import { argon2Config } from "../../../config/cryptography.js"
-import { User, sequelize } from "../../models/userModel.js";
+import { User } from "../../models/User.js";
 import { loginRequest } from "../requests/auth/loginRequest.js"
 import { registerRequest } from "../requests/auth/registerRequest.js"
-await sequelize.sync();
+
 
 export const authController = {
   loginView: (req, res) => res.render("login", { title: "Login" }),

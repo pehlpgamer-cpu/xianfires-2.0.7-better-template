@@ -1,40 +1,43 @@
+import { Sequelize } from "sequelize";
+import { sequelize } from "../database/database.js";
 
-import { sequelize } from "../app/models/db.js";
-import inquirer from "inquirer";
-import { mysqlConfig, defaultConfig } from "../config/database.js";
+// 🚨 CRITICAL: Import your models so they execute and register!
+import "../app/models/Product.js"; 
+// import "../app/models/User.js"; // Add other models here
 
-const rootSequelize = mysqlConfig;
-let dbName = null;
-switch (process.env.DB_DIALECT)
-{
-  case "mysql":
-    dbName = process.env.MYSQL_NAME || defaultConfig.mysql.name
-  break;
-  default:
-    console.log("⚠️ " + process.env.DB_DIALECT + " is not a valid database dialect")
-  break;
-}
+// Helper function to create the database if it doesn't exist
+async function ensureDatabaseExists() {
+  const tempDb = new Sequelize(
+    'mysql', 
+    'root', 
+    "mYNSn4qm6sgEez29agtW7dbfs7MG08YamNf8VPQfSaHxXssW26vXXa7drW3urJxn", 
+    { host: "localhost", dialect: "mysql", logging: false }
+  );
 
-const { createDb } = await inquirer.prompt([
-  {
-    type: "confirm",
-    name: "createDb",
-    message: `Database '${dbName}' may not exist. Create it?`,
-    default: true,
-  },
-]);
-
-if (createDb) {
-  await rootSequelize.query("CREATE DATABASE IF NOT EXISTS " + dbName);
-  console.log("✅ Database created (if it did not exist)");
+  try {
+    await tempDb.query("CREATE DATABASE IF NOT EXISTS `xianfire-enhanced-database`;");
+    console.log("✅ Database ensured!");
+  } finally {
+    await tempDb.close();
+  }
 }
 
 try {
-  await sequelize.sync({ force: true });
-  console.log("1. ✅ Tables created for all models!");
+  console.log("⏳ Checking if database exists...");
+  await ensureDatabaseExists();
 
-  await sequelize.authenticate();
-  console.log("2. ✅ Connected to MySQL database!");
+  const db = sequelize()
+  // Verify connection using the shared instance
+  await db.authenticate();
+  console.log("✅ Connected to MySQL database!");
+
+  // Verify models are registered
+  console.log("Registered models:", Object.keys(db.models)); 
+
+  // Sync tables
+  await db.sync({ force: true }); 
+  console.log("✅ Tables created for all models!");
+
 } catch (err) {
   console.error("❌ Migration failed:", err);
 } finally {
