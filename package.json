@@ -10,7 +10,9 @@
   "scripts": {
     "start": "node index.js",
     "xian": "nodemon index.js",
-    "migrate:fresh": "node ./scripts/migrate.js",
+    "migrate": "node ./scripts/migrate/migrate.js",
+    "migrate:fresh": "node ./scripts/migrate/fresh.js",
+    "migrate:drop": "node ./scripts/migrate/drop.js",
     "create:model": "node ./scripts/create/index.js model",
     "create:controller": "node ./scripts/create/index.js controller",
     "route:list": "node ./scripts/list-routes.js",
@@ -28,7 +30,7 @@
     "test:dep": "test:dep:quick; test:dep:html, test:dep:matrix",
     "test:dep:quick": "npx dependency-cruiser app database routes index.js tests scripts config",
     "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes index.js tests scripts config",
-    "test:dep:matrix": "npx dependency-cruiser -T html -f dependencies.html app database routes index.js tests scripts config"
+    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes index.js tests scripts config"
   },
   "dependencies": {
     "argon2": "^0.45.1",

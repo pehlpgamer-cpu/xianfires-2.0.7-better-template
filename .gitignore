@@ -8,5 +8,5 @@ dist
 test/__app
 backup
 
-dependencies.html
-dependency_report.html
+dependency-matrix.html
+dependency-report.html

@@ -12,7 +12,7 @@ export const Product = sequelize.define("Product", {
     allowNull: true 
   },
   price: { 
-    type: DataTypes.DECIMAL, 
+    type: DataTypes.DECIMAL(2), 
     allowNull: false 
   },
   stock: { 

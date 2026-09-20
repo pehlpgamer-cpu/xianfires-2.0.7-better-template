@@ -1,10 +1,23 @@
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Replicate __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+//const __dirname = path.dirname(__filename);
+
+export const development = 
+{
+  username: "root",
+  password: "mYNSn4qm6sgEez29agtW7dbfs7MG08YamNf8VPQfSaHxXssW26vXXa7drW3urJxn",
+  database: "xianfire-2.0.7-better-template-local",
+  host: 'localhost',
+  port: 3306,
+  dialect: 'mysql',
+  dialectOptions: {
+    bigNumberStrings: true,
+  },
+}
 
 export const test = 
 {
