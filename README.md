@@ -104,6 +104,7 @@ $extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "s
 # AI generated 
 ## AI slop
 - `list-routes.js` 
+- `./index.js` xian view engine
 
 ## Partial
 - `sequelize` implementation because `sequelize-cli` is buggy, docs are in CommonJS style, so had I to make a workaround.

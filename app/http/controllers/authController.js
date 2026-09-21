@@ -7,13 +7,13 @@ import { registerRequest } from "../requests/auth/registerRequest.js"
 
 
 export const authController = {
-  loginView: (req, res) => res.render("login", { title: "Login" }),
-  registerView: (req, res) => res.render("register", { title: "Register" }),
-  forgotPasswordView: (req, res) => res.render("forgotpassword", { title: "Forgot Password" }),
+  loginPage: (req, res) => res.render("auth/login", { PageTitle: "Login" }),
+  registerPage: (req, res) => res.render("auth/register", { PageTitle: "Register" }),
+  forgotPasswordPage: (req, res) => res.render("auth/forgotpassword", { PageTitle: "Forgot Password" }),
 
-  dashboardView: (req, res) => {
+  dashboardPage: (req, res) => {
     if (!req.session.userId) return res.redirect("/login");
-    res.render("dashboard", { title: "Dashboard" });
+    res.render("dashboard", { PageTitle: "Dashboard" });
   },
 
   login: async (req, res) => {

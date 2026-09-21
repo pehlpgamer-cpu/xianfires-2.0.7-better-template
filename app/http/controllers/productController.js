@@ -14,7 +14,7 @@ export const productController = {
   index: async (req, res) => {
     const validated = getProductRequest(req)
     const result = await Product.findAll()
-    res.json(result)
+    res.render("product", { pageTitle: "Products!!!", products: result })
   },
 
   store: async (req, res) => {

@@ -5,10 +5,10 @@ router.get("/", homePage);
 
 import { authController } from "../app/http/controllers/authController.js";
 
-router.get("/register/view", authController.registerView);
-router.get("/forgot-password/view", authController.forgotPasswordView);
-router.get("/dashboard/view", authController.dashboardView);
-router.get("/login/view", authController.loginView);
+router.get("/register-page", authController.registerPage);
+router.get("/forgot-password-page", authController.forgotPasswordPage);
+router.get("/dashboard-page", authController.dashboardPage);
+router.get("/login-page", authController.loginPage);
 
 router.post("/login", authController.login);
 router.post("/register", authController.register);

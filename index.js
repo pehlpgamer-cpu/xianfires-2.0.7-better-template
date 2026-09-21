@@ -1,99 +1,109 @@
-
 import express from "express";
-import path from "path";
+import path from "node:path";
+import fs from "node:fs/promises";
 import session from "express-session";
 import flash from "connect-flash";
-
-import fs from "fs";
 import hbs from "hbs";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
+
+const viewDir = {
+    pages: path.join(__dirname, "views", "pages"),
+    partials: path.join(__dirname, "views", "partials"),
+};
+
+async function registerPartials(
+    directory,
+    baseDirectory = directory,
+) {
+    const entries = await fs.readdir(directory, {
+        withFileTypes: true,
+    });
+
+    await Promise.all(
+        entries.map(async (entry) => {
+            const fullPath = path.join(directory, entry.name);
+
+            if (entry.isDirectory()) {
+                await registerPartials(fullPath, baseDirectory);
+                return;
+            }
+
+            if (!entry.isFile() || !entry.name.endsWith(".xian")) {
+                return;
+            }
+
+            const partialName = path
+                .relative(baseDirectory, fullPath)
+                .replace(/\.xian$/, "")
+                .split(path.sep)
+                .join("/");
+
+            const content = await fs.readFile(fullPath, "utf8");
+
+            hbs.registerPartial(partialName, content);
+
+            console.log(`Registered partial: ${partialName}`);
+        }),
+    );
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(process.cwd(), "public")));
 
 app.use(
-  session({
-    secret: process.env.SECRET_KEY,
-    resave: false,
-    saveUninitialized: false,
-  }),
+    express.static(
+        path.join(process.cwd(), "public"),
+    ),
 );
+
+app.use(
+    session({
+        secret: process.env.SECRET_KEY,
+        resave: false,
+        saveUninitialized: false,
+    }),
+);
+
 app.use(flash());
 
-app.engine("xian", async (filePath, options, callback) => {
-  try {
-    const originalPartialsDir = hbs.partialsDir;
-    hbs.partialsDir = path.join(__dirname, "views");
-
-    const result = await new Promise((resolve, reject) => {
-      hbs.__express(filePath, options, (err, html) => {
-        if (err) return reject(err);
-        resolve(html);
-      });
-    });
-
-    hbs.partialsDir = originalPartialsDir;
-    callback(null, result);
-  } catch (err) {
-    callback(err);
-  }
-});
 app.use((req, res, next) => {
-  res.locals.success_msg = req.flash("success_msg");
-  res.locals.error_msg = req.flash("error_msg");
-  next();
+    res.locals.success_msg = req.flash("success_msg");
+    res.locals.error_msg = req.flash("error_msg");
+
+    next();
 });
 
-const viewDir = {
-  pages: "views/pages",
-  partials: "views/partials"
-}
+app.engine("xian", hbs.__express);
 
-app.set("views", path.join(__dirname, viewDir.pages));
+app.set("views", viewDir.pages);
 app.set("view engine", "xian");
-const partialsDir = path.join(__dirname, viewDir.partials);
-
-fs.readdir(partialsDir, (err, files) => {
-  if (err) {
-    console.error("❌ Could not read partials directory:", err);
-    return;
-  }
-
-  files
-    .filter((file) => file.endsWith(".xian"))
-    .forEach((file) => {
-      const partialName = file.replace(".xian", "");
-      const fullPath = path.join(partialsDir, file);
-
-      fs.readFile(fullPath, "utf8", (err, content) => {
-        if (err) {
-          console.error(`❌ Failed to read partial: ${file}`, err);
-          return;
-        }
-        hbs.registerPartial(partialName, content);
-      });
-    });
-});
 
 // ROUTES
 import web_router from "./routes/web.js";
-import api_v1_router from "./routes/api_v1.js"
+import api_v1_router from "./routes/api_v1.js";
 
 app.use("/", web_router);
 app.use("/api/v1", api_v1_router);
 
+async function bootstrap() {
+    await registerPartials(viewDir.partials);
 
-
-if (!process.env.ELECTRON) {
-  app.listen(PORT, () => console.log(`🔥 XianFire running at http://localhost:${PORT}`));
+    if (!process.env.ELECTRON) {
+        app.listen(PORT, () => {
+            console.log(
+                `🔥 XianFire running at http://localhost:${PORT}`,
+            );
+        });
+    }
 }
+
+await bootstrap();
 
 export default app;
