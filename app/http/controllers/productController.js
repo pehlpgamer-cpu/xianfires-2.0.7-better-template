@@ -7,22 +7,23 @@ import { singleResourceRequest } from "../requests/singleResourceRequest.js";
 import { Product } from "../../models/Product.js";
 export const productController = {
   show: async (req, res) => {
-    const validData = singleResourceRequest(req)
+    const validated = singleResourceRequest(req)
     
   },
 
-  index: (req, res) => {
-    const result = getProductRequest(req)
+  index: async (req, res) => {
+    const validated = getProductRequest(req)
+    const result = await Product.findAll()
     res.json(result)
   },
 
   store: async (req, res) => {
-    const data = storeProductRequest(req)
-    const product = Product.create({
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      stock: data.stock
+    const validated = storeProductRequest(req)
+    const product = await Product.create({
+      name: validated.name,
+      description: validated.description,
+      price: validated.price,
+      stock: validated.stock
     })
     res.json({id: product.id}).status(201)
   },
