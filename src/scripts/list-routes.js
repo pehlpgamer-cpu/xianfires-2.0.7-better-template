@@ -1,101 +1,152 @@
-// ./src/scripts/list-routes.js
-import express from "express";
 import { styleText } from "node:util";
 
-const app = express();
-
-//! Same logic in `./src/app.js` on line 11-12 and 109-111
-//TODO - reduce duplicate code
-const web_router = (await import("../../routes/web.js")).default;
-const api_v1_router = (await import("../../routes/api_v1.js")).default;
-app.use("/", web_router);
-app.use("/api/v1", api_v1_router);
-//! -----------------------------------------------------------------------------------
-
+import app from "../app.js";
+import { routeGroups } from "../../routes/index.js";
 
 const routes = [];
 
+const routerPrefixes = new Map(
+  routeGroups.map(({ router, prefix }) => [
+    router,
+    prefix,
+  ]),
+);
+
 function walk(stack, prefix = "") {
   for (const layer of stack ?? []) {
-    // Regular route
     if (layer.route) {
       const methods = Object.keys(layer.route.methods)
-        .filter((method) => layer.route.methods[method])
+        .filter(
+          (method) => layer.route.methods[method],
+        )
         .map((method) => method.toUpperCase());
 
       const handler = layer.route.stack
-        .map((entry) => entry.handle?.name || "anonymous")
+        .map(
+          (entry) =>
+            entry.handle?.name ?? "anonymous",
+        )
         .join(" → ");
+
+      const routePath =
+        typeof layer.route.path === "string"
+          ? layer.route.path
+          : String(layer.route.path);
 
       routes.push({
         methods,
-        path: prefix + layer.route.path,
+        path: joinPaths(prefix, routePath),
         handler,
       });
 
       continue;
     }
 
-    // Nested router
     if (layer.handle?.stack) {
-      walk(layer.handle.stack, prefix);
+      const nestedPrefix =
+        routerPrefixes.get(layer.handle);
+
+      walk(
+        layer.handle.stack,
+        nestedPrefix !== undefined
+          ? joinPaths(prefix, nestedPrefix)
+          : prefix,
+      );
     }
   }
+}
+
+function joinPaths(...parts) {
+  const result = parts
+    .filter(Boolean)
+    .join("/")
+    .replace(/\/+/g, "/");
+
+  if (!result || result === "/") {
+    return "/";
+  }
+
+  return result.startsWith("/")
+    ? result
+    : `/${result}`;
 }
 
 const applicationRouter = app._router;
 
 if (!applicationRouter?.stack) {
-  console.error("❌ Unable to inspect Express router stack.");
-  process.exit(1);
-}
-
-walk(applicationRouter.stack);
-
-console.log("\n");
-console.log(`║ ${styleText(["bold", "underline", "bgBlack"], "🔥 XianFire — Registered Routes")}`);
-
-if (routes.length === 0) {
-  console.log("║ ⚠️ No routes found");
-} else {
-  const methodWidth = Math.max(
-    ...routes.flatMap((route) => route.methods.map((method) => method.length)),
-    6,
+  console.error(
+    "❌ Unable to inspect Express router stack.",
   );
 
-  const pathWidth = Math.max(...routes.map((route) => route.path.length), 4);
-  for (const [index, route] of routes.entries()) {
-    const line = String(index + 1).padStart(3);
-    const path = route.path.padEnd(pathWidth);
+  process.exitCode = 1;
+} else {
+  walk(applicationRouter.stack);
 
-    const methods = route.methods
-      .map((method) => {
-        const padded = method.padEnd(methodWidth);
+  console.log("");
 
-        switch (method) {
-          case "GET":
-            return styleText("green", padded);
+  console.log(
+    styleText(
+      ["bold", "underline"],
+      "🔥 XianFire — Registered Routes",
+    ),
+  );
 
-          case "POST":
-            return styleText("yellow", padded);
+  console.log("");
 
-          case "PUT":
-          case "PATCH":
-            return styleText("blue", padded);
+  if (routes.length === 0) {
+    console.log("⚠️ No routes found");
+  } else {
+    const methodWidth = Math.max(
+      6,
+      ...routes.flatMap((route) =>
+        route.methods.map(
+          (method) => method.length,
+        ),
+      ),
+    );
 
-          case "DELETE":
-            return styleText("red", padded);
+    const pathWidth = Math.max(
+      4,
+      ...routes.map(
+        (route) => route.path.length,
+      ),
+    );
 
-          default:
-            return padded;
-        }
-      })
-      .join(", ");
+    for (const [index, route] of routes.entries()) {
+      const number = String(index + 1).padStart(3);
+      const path = route.path.padEnd(pathWidth);
 
-    console.log(`║ ${line}  ${methods}  ${path}  ${route.handler}`);
+      const methods = route.methods
+        .map((method) => {
+          const padded = method.padEnd(methodWidth);
+
+          switch (method) {
+            case "GET":
+              return styleText("green", padded);
+
+            case "POST":
+              return styleText("yellow", padded);
+
+            case "PUT":
+            case "PATCH":
+              return styleText("blue", padded);
+
+            case "DELETE":
+              return styleText("red", padded);
+
+            default:
+              return padded;
+          }
+        })
+        .join(", ");
+
+      console.log(
+        `${number}  ${methods}  ${path}  ${route.handler}`,
+      );
+    }
   }
+
+  console.log(
+    `\nTotal: ${routes.length} route(s) registered\n`,
+  );
 }
-
-console.log(`\n   Total: ${routes.length} route(s) registered\n`);
-
-process.exit(0);

@@ -8,8 +8,8 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
-    "start": "node ./src/app.js",
-    "xian": "nodemon ./src/app.js",
+    "start": "node ./src/server.js",
+    "xian": "nodemon ./src/server.js",
     "migrate": "node ./src/scripts/migrate/migrate.js",
     "migrate:fresh": "node ./src/scripts/migrate/fresh.js",
     "migrate:drop": "node ./src/scripts/migrate/drop.js",
@@ -27,7 +27,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "test": "node bin/test.js; npm run test:dep",
-    "test:dep": "npm run test:dep:quick; npm run test:dep:html; npm run test:dep:matrix;",
+    "test:dep": "npm run test:dep:quick; npm run test:dep:report; npm run test:dep:matrix;",
     "test:dep:quick": "npx dependency-cruiser app database routes tests config src",
     "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests config src",
     "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests config src"
