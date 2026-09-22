@@ -13,43 +13,15 @@ export const productController = {
 
   index: async (req, res) => {
     const validated = getProductRequest(req)
-    //const products = await Product.findAll()
+    const products = await Product.findAll(); 
+    console.log(JSON.stringify(products))
     res.render("product", 
       { 
         pageTitle: "Products!!!",
         user: { 
           isAdmin: true
         },
-        products: [
-          {
-            name: "EcoFlow Pro River 2 - 409wh",
-            price: 28000.00
-          },
-          {
-            name: "Acer nitro V 15.5 inch",
-            price: 36000.00
-          },
-          {
-            name: "Atomic Habits",
-            price: 599.00
-          },
-          {
-            name: "Product 12893",
-            price: 59329.00
-          },
-          {
-            name: "Product 12893",
-            price: 59329.00
-          },
-          {
-            name: "Product 93",
-            price: 9999.00
-          },
-          {
-            name: "Product 10003",
-            price: 59.00
-          }
-        ]
+        products: products
       }
     )
   },
