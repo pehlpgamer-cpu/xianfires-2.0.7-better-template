@@ -13,26 +13,26 @@ provides application-level conventions and lifecycle management.
 
 ### Main features
 
--   Isolated Handlebars instance with `hbs.create()`
--   Express `app.engine()` integration
--   `.xian` templates
--   Recursive partial discovery and registration
--   Namespaced/nested partials
--   Layouts with a default layout
--   Per-render layout selection or disabling
--   Automatic JavaScript helper registration
--   Development/production template caching
--   Chokidar development watcher
--   Template-cache invalidation
--   Development strict mode
--   Structured `XianTemplateError`
--   Synchronized initialization before the server starts
+- Isolated Handlebars instance with `hbs.create()`
+- Express `app.engine()` integration
+- `.xian` templates
+- Recursive partial discovery and registration
+- Namespaced/nested partials
+- Layouts with a default layout
+- Per-render layout selection or disabling
+- Automatic JavaScript helper registration
+- Development/production template caching
+- Chokidar development watcher
+- Template-cache invalidation
+- Development strict mode
+- Structured `XianTemplateError`
+- Synchronized initialization before the server starts
 
-------------------------------------------------------------------------
+---
 
 # 2. Architecture
 
-``` text
+```text
 src/
 ├── app.js
 ├── routes/
@@ -56,19 +56,21 @@ views/
 
 Responsibilities:
 
-  Module          Responsibility
-  --------------- ----------------------------------------------
-  `engine.js`     Main Express-compatible rendering engine
-  `partials.js`   Recursive discovery and partial registration
-  `layouts.js`    Layout resolution
-  `helpers.js`    Automatic helper discovery/registration
-  `errors.js`     Xian-specific rendering errors
-  `watcher.js`    Development filesystem watching
-  `index.js`      Public Xian API
+Module Responsibility
+
+---
+
+`engine.js` Main Express-compatible rendering engine
+`partials.js` Recursive discovery and partial registration
+`layouts.js` Layout resolution
+`helpers.js` Automatic helper discovery/registration
+`errors.js` Xian-specific rendering errors
+`watcher.js` Development filesystem watching
+`index.js` Public Xian API
 
 High-level flow:
 
-``` text
+```text
 Express
    │
    ▼
@@ -88,31 +90,31 @@ Handlebars
 HTML
 ```
 
-------------------------------------------------------------------------
+---
 
 # 3. Installation
 
 Xian uses the existing Handlebars/HBS integration and Chokidar for
 development watching.
 
-``` powershell
+```powershell
 npm install hbs
 npm install chokidar
 ```
 
 If `hbs` is already installed, only install Chokidar:
 
-``` powershell
+```powershell
 npm install chokidar
 ```
 
-------------------------------------------------------------------------
+---
 
 # 4. Directory Structure
 
 Recommended structure:
 
-``` text
+```text
 project/
 ├── src/
 │   ├── app.js
@@ -158,113 +160,84 @@ project/
 └── .env
 ```
 
-------------------------------------------------------------------------
+---
 
 # 5. Express Integration
 
 Configure the view directories:
 
-``` js
+```js
 const viewDirectories = {
-    pages: path.join(
-        __dirname,
-        "../views/pages",
-    ),
+  pages: path.join(__dirname, "../views/pages"),
 
-    partials: path.join(
-        __dirname,
-        "../views/partials",
-    ),
+  partials: path.join(__dirname, "../views/partials"),
 
-    layouts: path.join(
-        __dirname,
-        "../views/layouts",
-    ),
+  layouts: path.join(__dirname, "../views/layouts"),
 
-    helpers: path.join(
-        __dirname,
-        "../views/helpers",
-    ),
+  helpers: path.join(__dirname, "../views/helpers"),
 };
 ```
 
 Initialize Xian:
 
-``` js
+```js
 const xian = await createXianEngine({
-    partialsDirectory:
-        viewDirectories.partials,
+  partialsDirectory: viewDirectories.partials,
 
-    layoutsDirectory:
-        viewDirectories.layouts,
+  layoutsDirectory: viewDirectories.layouts,
 
-    helpersDirectory:
-        viewDirectories.helpers,
+  helpersDirectory: viewDirectories.helpers,
 
-    environment:
-        NODE_ENV,
+  environment: NODE_ENV,
 
-    defaultLayout:
-        "main",
+  defaultLayout: "main",
 
-    strict:
-        NODE_ENV === "development",
+  strict: NODE_ENV === "development",
 
-    watch:
-        NODE_ENV === "development",
+  watch: NODE_ENV === "development",
 
-    cache:
-        NODE_ENV === "production",
+  cache: NODE_ENV === "production",
 });
 ```
 
 Register it with Express:
 
-``` js
-app.engine(
-    "xian",
-    xian.engine,
-);
+```js
+app.engine("xian", xian.engine);
 
-app.set(
-    "views",
-    viewDirectories.pages,
-);
+app.set("views", viewDirectories.pages);
 
-app.set(
-    "view engine",
-    "xian",
-);
+app.set("view engine", "xian");
 ```
 
 Now:
 
-``` js
+```js
 res.render("home");
 ```
 
 resolves to:
 
-``` text
+```text
 views/pages/home.xian
 ```
 
 A nested page:
 
-``` js
+```js
 res.render("admin/users/index");
 ```
 
 resolves to:
 
-``` text
+```text
 views/pages/admin/users/index.xian
 ```
 
 Express resolves pages. Xian does not need to recursively scan the pages
 directory.
 
-------------------------------------------------------------------------
+---
 
 # 6. Why Initialization Must Be Asynchronous
 
@@ -274,7 +247,7 @@ Therefore Xian must finish initialization before requests are accepted.
 
 Recommended lifecycle:
 
-``` text
+```text
 start application
       ↓
 create Xian
@@ -294,7 +267,7 @@ listen()
 
 Do not start the HTTP server before:
 
-``` js
+```js
 await createXianEngine(...)
 ```
 
@@ -303,13 +276,13 @@ has completed.
 This prevents the first request from racing against partial/helper
 initialization.
 
-------------------------------------------------------------------------
+---
 
 # 7. Isolated Handlebars Instance
 
 Xian uses:
 
-``` js
+```js
 const xian = hbs.create();
 
 const handlebars = xian.handlebars;
@@ -319,15 +292,15 @@ rather than relying on a global registry.
 
 This isolates:
 
--   partials
--   helpers
--   Handlebars configuration
--   template-engine state
+- partials
+- helpers
+- Handlebars configuration
+- template-engine state
 
 The result is easier to test and avoids request-time mutation of global
 state.
 
-------------------------------------------------------------------------
+---
 
 # 8. Pages
 
@@ -335,37 +308,37 @@ Pages are complete view templates.
 
 Example:
 
-``` text
+```text
 views/pages/home.xian
 ```
 
-``` hbs
+```hbs
 <section>
 
-    <h1>
-        Welcome to XianFire
-    </h1>
+  <h1>
+    Welcome to XianFire
+  </h1>
 
-    <p>
-        This page is rendered using Xian.
-    </p>
+  <p>
+    This page is rendered using Xian.
+  </p>
 
 </section>
 ```
 
 Route:
 
-``` js
+```js
 router.get("/", (req, res) => {
-    res.render("home", {
-        title: "Home",
-    });
+  res.render("home", {
+    title: "Home",
+  });
 });
 ```
 
 Nested pages use normal Express view resolution:
 
-``` text
+```text
 views/pages/
 └── admin/
     └── users/
@@ -373,11 +346,11 @@ views/pages/
         └── show.xian
 ```
 
-``` js
+```js
 res.render("admin/users/index");
 ```
 
-------------------------------------------------------------------------
+---
 
 # 9. Partials
 
@@ -385,33 +358,33 @@ Partials are reusable Handlebars fragments.
 
 Example:
 
-``` text
+```text
 views/partials/navbar.xian
 ```
 
-``` hbs
+```hbs
 <nav>
-    <a href="/">
-        XianFire
-    </a>
+  <a href="/">
+    XianFire
+  </a>
 
-    <a href="/products">
-        Products
-    </a>
+  <a href="/products">
+    Products
+  </a>
 
-    <a href="/login">
-        Login
-    </a>
+  <a href="/login">
+    Login
+  </a>
 </nav>
 ```
 
 Use:
 
-``` hbs
+```hbs
 {{> navbar}}
 ```
 
-------------------------------------------------------------------------
+---
 
 # 10. Recursive Partials
 
@@ -419,7 +392,7 @@ Xian recursively scans the partial directory.
 
 Given:
 
-``` text
+```text
 views/partials/
 ├── navbar.xian
 ├── components/
@@ -431,7 +404,7 @@ views/partials/
 
 the registered names are:
 
-``` text
+```text
 navbar
 components/button
 components/card
@@ -440,7 +413,7 @@ admin/sidebar
 
 Usage:
 
-``` hbs
+```hbs
 {{> navbar}}
 
 {{> components/button}}
@@ -453,7 +426,7 @@ Usage:
 The partial name is derived from the file path relative to
 `views/partials`.
 
-------------------------------------------------------------------------
+---
 
 # 11. Partial Registration
 
@@ -469,26 +442,23 @@ Conceptually, Xian:
 
 Example:
 
-``` text
+```text
 views/partials/components/card.xian
 ```
 
 becomes:
 
-``` text
+```text
 components/card
 ```
 
 and is registered using:
 
-``` js
-handlebars.registerPartial(
-    "components/card",
-    content,
-);
+```js
+handlebars.registerPartial("components/card", content);
 ```
 
-------------------------------------------------------------------------
+---
 
 # 12. Components
 
@@ -496,31 +466,31 @@ Nested partials provide a simple component organization strategy.
 
 Example:
 
-``` text
+```text
 views/partials/components/card.xian
 ```
 
-``` hbs
+```hbs
 <article class="card">
 
-    <h2>
-        {{title}}
-    </h2>
+  <h2>
+    {{title}}
+  </h2>
 
-    <p>
-        {{description}}
-    </p>
+  <p>
+    {{description}}
+  </p>
 
-    <strong>
-        {{currency price}}
-    </strong>
+  <strong>
+    {{currency price}}
+  </strong>
 
 </article>
 ```
 
 Use:
 
-``` hbs
+```hbs
 {{> components/card
     title="Acer Nitro 5"
     description="Gaming laptop"
@@ -528,7 +498,7 @@ Use:
 }}
 ```
 
-------------------------------------------------------------------------
+---
 
 # 13. Layouts
 
@@ -536,11 +506,11 @@ Layouts provide the outer document structure.
 
 Example:
 
-``` text
+```text
 views/layouts/main.xian
 ```
 
-``` hbs
+```hbs
 <!DOCTYPE html>
 <html lang="en">
 
@@ -579,39 +549,39 @@ views/layouts/main.xian
 
 The page is rendered first and its HTML is passed as:
 
-``` text
+```text
 body
 ```
 
 to the layout.
 
-------------------------------------------------------------------------
+---
 
 # 14. Default Layout
 
 Configure:
 
-``` js
-defaultLayout: "main"
+```js
+defaultLayout: "main";
 ```
 
 Then:
 
-``` js
+```js
 res.render("home", {
-    title: "Home",
+  title: "Home",
 });
 ```
 
 automatically uses:
 
-``` text
+```text
 views/layouts/main.xian
 ```
 
 Rendering:
 
-``` text
+```text
 home.xian
     ↓
 page HTML
@@ -623,16 +593,16 @@ main.xian
 final HTML
 ```
 
-------------------------------------------------------------------------
+---
 
 # 15. Disabling a Layout
 
 Use:
 
-``` js
+```js
 res.render("admin/login", {
-    title: "Login",
-    layout: false,
+  title: "Login",
+  layout: false,
 });
 ```
 
@@ -640,46 +610,46 @@ This renders the page without the default layout.
 
 Useful for:
 
--   login pages
--   special standalone pages
--   error pages
--   HTML fragments
+- login pages
+- special standalone pages
+- error pages
+- HTML fragments
 
-------------------------------------------------------------------------
+---
 
 # 16. Selecting a Different Layout
 
 Use:
 
-``` js
+```js
 res.render("admin/dashboard", {
-    title: "Dashboard",
-    layout: "admin",
+  title: "Dashboard",
+  layout: "admin",
 });
 ```
 
 Xian resolves:
 
-``` text
+```text
 views/layouts/admin.xian
 ```
 
 This allows separate layouts for public, authentication, and
 administrative areas.
 
-------------------------------------------------------------------------
+---
 
 # 17. Layout Resolution
 
 The layout resolver turns:
 
-``` text
+```text
 main
 ```
 
 into:
 
-``` text
+```text
 views/layouts/main.xian
 ```
 
@@ -688,7 +658,7 @@ and verifies that the file exists.
 A missing layout results in an error rather than silently rendering an
 incomplete page.
 
-------------------------------------------------------------------------
+---
 
 # 18. Helpers
 
@@ -696,37 +666,37 @@ Helpers are JavaScript functions exposed to templates.
 
 Example:
 
-``` text
+```text
 views/helpers/uppercase.js
 ```
 
-``` js
+```js
 export default function uppercase(value) {
-    return String(value ?? "").toUpperCase();
+  return String(value ?? "").toUpperCase();
 }
 ```
 
 Template:
 
-``` hbs
+```hbs
 <h1>
-    {{uppercase name}}
+  {{uppercase name}}
 </h1>
 ```
 
-------------------------------------------------------------------------
+---
 
 # 19. JSON Helper
 
-``` js
+```js
 export default function json(value) {
-    return JSON.stringify(value);
+  return JSON.stringify(value);
 }
 ```
 
 Use:
 
-``` hbs
+```hbs
 <pre>
     {{json product}}
 </pre>
@@ -734,47 +704,44 @@ Use:
 
 This is especially useful while debugging template data.
 
-------------------------------------------------------------------------
+---
 
 # 20. Currency Helper
 
-``` js
+```js
 export default function currency(value) {
-    const amount = Number(value);
+  const amount = Number(value);
 
-    if (!Number.isFinite(amount)) {
-        return "";
-    }
+  if (!Number.isFinite(amount)) {
+    return "";
+  }
 
-    return new Intl.NumberFormat(
-        "en-PH",
-        {
-            style: "currency",
-            currency: "PHP",
-        },
-    ).format(amount);
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(amount);
 }
 ```
 
 Use:
 
-``` hbs
+```hbs
 {{currency price}}
 ```
 
-------------------------------------------------------------------------
+---
 
 # 21. Automatic Helper Registration
 
 Xian scans:
 
-``` text
+```text
 views/helpers/
 ```
 
 for:
 
-``` text
+```text
 .js
 .mjs
 ```
@@ -783,15 +750,15 @@ files.
 
 A default export is treated as the helper:
 
-``` js
+```js
 export default function currency(value) {
-    // ...
+  // ...
 }
 ```
 
 The file name determines the helper name:
 
-``` text
+```text
 currency.js → currency
 uppercase.js → uppercase
 json.js → json
@@ -799,13 +766,13 @@ json.js → json
 
 Therefore:
 
-``` hbs
+```hbs
 {{currency price}}
 {{uppercase name}}
 {{json product}}
 ```
 
-------------------------------------------------------------------------
+---
 
 # 22. Helper Validation
 
@@ -813,55 +780,48 @@ A helper must export a function.
 
 This is valid:
 
-``` js
+```js
 export default function helper(value) {
-    return value;
+  return value;
 }
 ```
 
 This is invalid:
 
-``` js
+```js
 export default "hello";
 ```
 
 Xian validates:
 
-``` js
-typeof helper === "function"
+```js
+typeof helper === "function";
 ```
 
 and throws a `TypeError` for invalid helper modules.
 
-------------------------------------------------------------------------
+---
 
 # 23. Template Compilation
 
 Xian reads a `.xian` file:
 
-``` js
-const source = await fs.readFile(
-    filePath,
-    "utf8",
-);
+```js
+const source = await fs.readFile(filePath, "utf8");
 ```
 
 and compiles it:
 
-``` js
-const template =
-    handlebars.compile(
-        source,
-        {
-            strict,
-            noEscape: false,
-        },
-    );
+```js
+const template = handlebars.compile(source, {
+  strict,
+  noEscape: false,
+});
 ```
 
 The result is a rendering function.
 
-``` text
+```text
 .xian source
     ↓
 Handlebars compiler
@@ -871,19 +831,19 @@ compiled function
 HTML
 ```
 
-------------------------------------------------------------------------
+---
 
 # 24. Template Cache
 
 Xian uses:
 
-``` js
+```js
 const templateCache = new Map();
 ```
 
 The conceptual mapping is:
 
-``` text
+```text
 template path
       ↓
 compiled template function
@@ -891,25 +851,25 @@ compiled template function
 
 Example:
 
-``` text
+```text
 views/pages/home.xian
       ↓
 compiled Handlebars function
 ```
 
-------------------------------------------------------------------------
+---
 
 # 25. Development Cache
 
 Recommended:
 
-``` js
-cache: false
+```js
+cache: false;
 ```
 
 Rendering:
 
-``` text
+```text
 request
    ↓
 read file
@@ -923,19 +883,19 @@ This provides immediate template feedback.
 
 The trade-off is more filesystem and compilation work.
 
-------------------------------------------------------------------------
+---
 
 # 26. Production Cache
 
 Recommended:
 
-``` js
-cache: true
+```js
+cache: true;
 ```
 
 First request:
 
-``` text
+```text
 request
    ↓
 read
@@ -949,7 +909,7 @@ render
 
 Later requests:
 
-``` text
+```text
 request
    ↓
 cache lookup
@@ -961,19 +921,19 @@ render
 
 This avoids repeatedly compiling unchanged templates.
 
-------------------------------------------------------------------------
+---
 
 # 27. Cache Invalidation
 
 Xian exposes:
 
-``` js
+```js
 invalidateTemplate(filePath);
 ```
 
 which performs:
 
-``` js
+```js
 templateCache.delete(filePath);
 ```
 
@@ -981,7 +941,7 @@ The development watcher uses this when templates change.
 
 Example:
 
-``` text
+```text
 home.xian changes
        ↓
 watcher
@@ -993,7 +953,7 @@ next request
 read + compile new template
 ```
 
-------------------------------------------------------------------------
+---
 
 # 28. Development Watcher
 
@@ -1001,13 +961,13 @@ Xian uses Chokidar.
 
 Install:
 
-``` powershell
+```powershell
 npm install chokidar
 ```
 
 The watcher monitors:
 
-``` text
+```text
 partials/
 layouts/
 helpers/
@@ -1015,28 +975,21 @@ helpers/
 
 with:
 
-``` js
-chokidar.watch(
-    [
-        partialsDirectory,
-        layoutsDirectory,
-        helpersDirectory,
-    ],
-    {
-        ignoreInitial: true,
-    },
-);
+```js
+chokidar.watch([partialsDirectory, layoutsDirectory, helpersDirectory], {
+  ignoreInitial: true,
+});
 ```
 
 The watcher is intended for development, not production.
 
-------------------------------------------------------------------------
+---
 
 # 29. File Change Handling
 
 When a `.xian` file changes:
 
-``` text
+```text
 file changed
     ↓
 Chokidar
@@ -1048,7 +1001,7 @@ invalidate cache
 
 When a partial is added:
 
-``` text
+```text
 new .xian file
     ↓
 registerPartial()
@@ -1056,35 +1009,35 @@ registerPartial()
 
 When a partial is removed:
 
-``` text
+```text
 deleted .xian file
     ↓
 unregisterPartial()
 ```
 
-------------------------------------------------------------------------
+---
 
 # 30. Strict Mode
 
 Development can enable:
 
-``` js
-strict: true
+```js
+strict: true;
 ```
 
 Example:
 
-``` hbs
+```hbs
 <h1>
-    {{user.name}}
+  {{user.name}}
 </h1>
 ```
 
 Controller:
 
-``` js
+```js
 res.render("home", {
-    user: {},
+  user: {},
 });
 ```
 
@@ -1093,32 +1046,32 @@ producing empty output.
 
 Recommended development configuration:
 
-``` js
-strict: true
+```js
+strict: true;
 ```
 
 Production behavior can be configured separately.
 
-------------------------------------------------------------------------
+---
 
 # 31. Structured Template Errors
 
 Xian defines:
 
-``` js
+```js
 export class XianTemplateError extends Error
 ```
 
 It can retain:
 
--   template path
--   original error
--   line
--   column
+- template path
+- original error
+- line
+- column
 
 The normalized message follows the general form:
 
-``` text
+```text
 Failed to render Xian template
 "views/pages/home.xian"
 (line 12, column 8):
@@ -1128,45 +1081,42 @@ Failed to render Xian template
 Location information is extracted from possible error properties such
 as:
 
-``` js
-error.lineNumber
-error.line
-error.columnNumber
-error.column
+```js
+error.lineNumber;
+error.line;
+error.columnNumber;
+error.column;
 ```
 
 If location information is unavailable, Xian still reports the template
 path and original error.
 
-------------------------------------------------------------------------
+---
 
 # 32. Error Flow
 
 Rendering failures are converted through:
 
-``` js
-createTemplateError(
-    error,
-    filePath,
-);
+```js
+createTemplateError(error, filePath);
 ```
 
 and passed to Express:
 
-``` js
+```js
 callback(xianError);
 ```
 
 This gives the application's error middleware a consistent Xian-specific
 error type.
 
-------------------------------------------------------------------------
+---
 
 # 33. HTML Escaping
 
 Normal Handlebars interpolation:
 
-``` hbs
+```hbs
 {{value}}
 ```
 
@@ -1174,7 +1124,7 @@ is escaped.
 
 Raw HTML interpolation:
 
-``` hbs
+```hbs
 {{{value}}}
 ```
 
@@ -1182,8 +1132,8 @@ is not escaped.
 
 Xian explicitly uses:
 
-``` js
-noEscape: false
+```js
+noEscape: false;
 ```
 
 to retain normal escaping behavior.
@@ -1192,56 +1142,56 @@ Use triple braces carefully.
 
 For untrusted user input, prefer:
 
-``` hbs
+```hbs
 {{userInput}}
 ```
 
 rather than:
 
-``` hbs
+```hbs
 {{{userInput}}}
 ```
 
 The layout's:
 
-``` hbs
+```hbs
 {{{body}}}
 ```
 
 is intentional because `body` already contains rendered page HTML.
 
-------------------------------------------------------------------------
+---
 
 # 34. Rendering Data
 
 A route can pass ordinary JavaScript data:
 
-``` js
+```js
 res.render("products/index", {
-    title: "Products",
-    products,
+  title: "Products",
+  products,
 });
 ```
 
 Template:
 
-``` hbs
+```hbs
 <h1>
-    {{title}}
+  {{title}}
 </h1>
 
 {{#each products}}
-    <article>
-        <h2>
-            {{name}}
-        </h2>
-    </article>
+  <article>
+    <h2>
+      {{name}}
+    </h2>
+  </article>
 {{/each}}
 ```
 
 Xian does not require a special data-transfer object for view rendering.
 
-------------------------------------------------------------------------
+---
 
 # 35. Flash Messages
 
@@ -1249,35 +1199,33 @@ Xian works with `res.locals`.
 
 Example:
 
-``` js
+```js
 app.use((req, res, next) => {
-    res.locals.success_msg =
-        req.flash("success_msg");
+  res.locals.success_msg = req.flash("success_msg");
 
-    res.locals.error_msg =
-        req.flash("error_msg");
+  res.locals.error_msg = req.flash("error_msg");
 
-    next();
+  next();
 });
 ```
 
 Template:
 
-``` hbs
+```hbs
 {{#if success_msg}}
-    <div class="alert success">
-        {{success_msg}}
-    </div>
+  <div class="alert success">
+    {{success_msg}}
+  </div>
 {{/if}}
 
 {{#if error_msg}}
-    <div class="alert error">
-        {{error_msg}}
-    </div>
+  <div class="alert error">
+    {{error_msg}}
+  </div>
 {{/if}}
 ```
 
-------------------------------------------------------------------------
+---
 
 # 36. Complete Rendering Example
 
@@ -1285,7 +1233,7 @@ Template:
 
 `views/pages/home.xian`
 
-``` hbs
+```hbs
 <section>
 
     <h1>
@@ -1309,20 +1257,20 @@ Template:
 
 `views/partials/components/card.xian`
 
-``` hbs
+```hbs
 <article class="card">
 
-    <h2>
-        {{title}}
-    </h2>
+  <h2>
+    {{title}}
+  </h2>
 
-    <p>
-        {{description}}
-    </p>
+  <p>
+    {{description}}
+  </p>
 
-    <strong>
-        {{currency price}}
-    </strong>
+  <strong>
+    {{currency price}}
+  </strong>
 
 </article>
 ```
@@ -1331,7 +1279,7 @@ Template:
 
 `views/layouts/main.xian`
 
-``` hbs
+```hbs
 <!DOCTYPE html>
 <html lang="en">
 
@@ -1354,17 +1302,17 @@ Template:
 
 ### Route
 
-``` js
+```js
 router.get("/", (req, res) => {
-    res.render("home", {
-        title: "Home",
-    });
+  res.render("home", {
+    title: "Home",
+  });
 });
 ```
 
 Rendering flow:
 
-``` text
+```text
 GET /
  ↓
 route
@@ -1382,13 +1330,13 @@ main.xian
 HTML response
 ```
 
-------------------------------------------------------------------------
+---
 
 # 37. Environment Configuration
 
 Recommended development:
 
-``` js
+```js
 {
     environment: "development",
     strict: true,
@@ -1399,7 +1347,7 @@ Recommended development:
 
 Recommended production:
 
-``` js
+```js
 {
     environment: "production",
     strict: false,
@@ -1410,20 +1358,22 @@ Recommended production:
 
 The important distinction is:
 
-  Feature                  Development    Production
-  ---------------------- ------------- -------------
-  Cache                    Usually off            On
-  Watcher                           On           Off
-  Strict mode                       On   Usually off
-  Recompile on request        Possible       Avoided
+Feature Development Production
 
-------------------------------------------------------------------------
+---
+
+Cache Usually off On
+Watcher On Off
+Strict mode On Usually off
+Recompile on request Possible Avoided
+
+---
 
 # 38. Xian Engine API
 
 `createXianEngine()` returns an object containing:
 
-``` js
+```js
 {
     engine,
     hbs,
@@ -1438,7 +1388,7 @@ The important distinction is:
 
 Express-compatible view-engine function.
 
-``` js
+```js
 app.engine("xian", xian.engine);
 ```
 
@@ -1458,7 +1408,7 @@ The compiled template `Map`.
 
 Invalidates one cached template:
 
-``` js
+```js
 xian.invalidateTemplate(filePath);
 ```
 
@@ -1466,36 +1416,33 @@ xian.invalidateTemplate(filePath);
 
 Closes the watcher:
 
-``` js
+```js
 await xian.close();
 ```
 
 Useful for graceful shutdown and tests.
 
-------------------------------------------------------------------------
+---
 
 # 39. Public API
 
 The recommended public import is:
 
-``` js
-import {
-    createXianEngine,
-    XianTemplateError,
-} from "./xian/index.js";
+```js
+import { createXianEngine, XianTemplateError } from "./xian/index.js";
 ```
 
 `index.js` acts as the public boundary of the subsystem.
 
 Application code should normally use:
 
-``` js
-createXianEngine()
+```js
+createXianEngine();
 ```
 
 rather than importing internal implementation modules directly.
 
-------------------------------------------------------------------------
+---
 
 # 40. Graceful Shutdown
 
@@ -1504,20 +1451,20 @@ should be closed during shutdown.
 
 Example:
 
-``` js
+```js
 process.on("SIGTERM", async () => {
-    await xian.close();
+  await xian.close();
 
-    server.close(() => {
-        process.exit(0);
-    });
+  server.close(() => {
+    process.exit(0);
+  });
 });
 ```
 
 This avoids leaving filesystem watchers active after the application
 stops.
 
-------------------------------------------------------------------------
+---
 
 # 41. Testing Strategy
 
@@ -1527,21 +1474,21 @@ Xian should be tested at several levels.
 
 Test:
 
--   recursive partial discovery
--   partial-name generation
--   partial registration
--   partial unregistration
--   layout resolution
--   missing-layout errors
--   helper discovery
--   invalid helper exports
--   template-error normalization
+- recursive partial discovery
+- partial-name generation
+- partial registration
+- partial unregistration
+- layout resolution
+- missing-layout errors
+- helper discovery
+- invalid helper exports
+- template-error normalization
 
 ## Integration tests
 
 Test:
 
-``` text
+```text
 Express
 +
 Xian
@@ -1551,31 +1498,29 @@ Handlebars
 
 Example:
 
-``` js
-const response = await request(app)
-    .get("/");
+```js
+const response = await request(app).get("/");
 
 expect(response.status).toBe(200);
 
-expect(response.text)
-    .toContain("Welcome to XianFire");
+expect(response.text).toContain("Welcome to XianFire");
 ```
 
 ## Rendering tests
 
 Verify:
 
--   page rendering
--   nested pages
--   partials
--   layouts
--   layout disabling
--   alternate layouts
--   helpers
--   escaping
--   strict-mode failures
+- page rendering
+- nested pages
+- partials
+- layouts
+- layout disabling
+- alternate layouts
+- helpers
+- escaping
+- strict-mode failures
 
-------------------------------------------------------------------------
+---
 
 # 42. Common Problems
 
@@ -1583,19 +1528,19 @@ Verify:
 
 For:
 
-``` text
+```text
 views/partials/components/card.xian
 ```
 
 use:
 
-``` hbs
+```hbs
 {{> components/card}}
 ```
 
 not:
 
-``` hbs
+```hbs
 {{> card}}
 ```
 
@@ -1605,13 +1550,13 @@ unless `card` was registered under that exact name.
 
 For:
 
-``` js
-layout: "admin"
+```js
+layout: "admin";
 ```
 
 the file must be:
 
-``` text
+```text
 views/layouts/admin.xian
 ```
 
@@ -1619,13 +1564,13 @@ views/layouts/admin.xian
 
 For:
 
-``` hbs
+```hbs
 {{currency price}}
 ```
 
 verify:
 
-``` text
+```text
 views/helpers/currency.js
 ```
 
@@ -1635,9 +1580,9 @@ exports a function.
 
 Development should normally use:
 
-``` js
-cache: false
-watch: true
+```js
+cache: false;
+watch: true;
 ```
 
 Also verify that the changed file is under a watched directory.
@@ -1646,19 +1591,19 @@ Also verify that the changed file is under a watched directory.
 
 Enable:
 
-``` js
-strict: true
+```js
+strict: true;
 ```
 
 during development to catch missing properties earlier.
 
-------------------------------------------------------------------------
+---
 
 # 43. Why the Architecture Is Modular
 
 Each concern has its own module:
 
-``` text
+```text
 engine.js
     ↓
 orchestration
@@ -1692,7 +1637,7 @@ This avoids putting all template-engine behavior into `app.js`.
 
 It also makes individual parts easier to test and replace.
 
-------------------------------------------------------------------------
+---
 
 # 44. Important Design Decisions
 
@@ -1700,8 +1645,8 @@ It also makes individual parts easier to test and replace.
 
 Use:
 
-``` js
-hbs.create()
+```js
+hbs.create();
 ```
 
 instead of mutating a global Handlebars instance.
@@ -1736,27 +1681,29 @@ Filesystem changes are handled automatically during development.
 
 Rendering errors retain template context.
 
-------------------------------------------------------------------------
+---
 
 # 45. Current Feature Matrix
 
-  Feature                         Status
-  ------------------------------- -------------
-  `.xian` Express engine          Implemented
-  Isolated Handlebars instance    Implemented
-  Recursive partials              Implemented
-  Nested partial namespaces       Implemented
-  Startup synchronization         Implemented
-  Compiled-template cache         Implemented
-  Default layout                  Implemented
-  Per-render layout selection     Implemented
-  Layout disabling                Implemented
-  Automatic helper registration   Implemented
-  Structured template errors      Implemented
-  Development watcher             Implemented
-  Strict development mode         Implemented
+Feature Status
 
-------------------------------------------------------------------------
+---
+
+`.xian` Express engine Implemented
+Isolated Handlebars instance Implemented
+Recursive partials Implemented
+Nested partial namespaces Implemented
+Startup synchronization Implemented
+Compiled-template cache Implemented
+Default layout Implemented
+Per-render layout selection Implemented
+Layout disabling Implemented
+Automatic helper registration Implemented
+Structured template errors Implemented
+Development watcher Implemented
+Strict development mode Implemented
+
+---
 
 # 46. Future Extensions
 
@@ -1764,7 +1711,7 @@ The current architecture can be extended with:
 
 ### Template precompilation
 
-``` text
+```text
 .xian
  ↓
 build step
@@ -1778,7 +1725,7 @@ production
 
 Possible hierarchy:
 
-``` text
+```text
 main
   ↓
 admin
@@ -1795,7 +1742,7 @@ partials.
 
 A dependency graph could track:
 
-``` text
+```text
 home.xian
  ├── navbar.xian
  └── components/card.xian
@@ -1807,20 +1754,20 @@ Then changing `card.xian` could invalidate pages that depend on it.
 
 Templates could expose metadata such as:
 
--   source path
--   layout
--   dependencies
--   template name
+- source path
+- layout
+- dependencies
+- template name
 
 This could improve diagnostics and development tooling.
 
-------------------------------------------------------------------------
+---
 
 # 47. Performance Model
 
 Development:
 
-``` text
+```text
 Request
   ↓
 Filesystem read
@@ -1832,7 +1779,7 @@ Render
 
 Production after first render:
 
-``` text
+```text
 Request
   ↓
 Cache lookup
@@ -1847,7 +1794,7 @@ for every request.
 
 This separates initialization work from request-time rendering work.
 
-------------------------------------------------------------------------
+---
 
 # 48. Security Model
 
@@ -1866,79 +1813,66 @@ Recommended rules:
 The template engine should be treated as part of the application's
 presentation layer, not as a security boundary.
 
-------------------------------------------------------------------------
+---
 
 # 49. Recommended Development Defaults
 
-``` js
+```js
 const xian = await createXianEngine({
-    partialsDirectory:
-        viewDirectories.partials,
+  partialsDirectory: viewDirectories.partials,
 
-    layoutsDirectory:
-        viewDirectories.layouts,
+  layoutsDirectory: viewDirectories.layouts,
 
-    helpersDirectory:
-        viewDirectories.helpers,
+  helpersDirectory: viewDirectories.helpers,
 
-    environment:
-        "development",
+  environment: "development",
 
-    defaultLayout:
-        "main",
+  defaultLayout: "main",
 
-    strict:
-        true,
+  strict: true,
 
-    watch:
-        true,
+  watch: true,
 
-    cache:
-        false,
+  cache: false,
 });
 ```
 
-------------------------------------------------------------------------
+---
 
 # 50. Recommended Production Defaults
 
-``` js
+```js
 const xian = await createXianEngine({
-    partialsDirectory:
-        viewDirectories.partials,
+  partialsDirectory: viewDirectories.partials,
 
-    layoutsDirectory:
-        viewDirectories.layouts,
+  layoutsDirectory: viewDirectories.layouts,
 
-    helpersDirectory:
-        viewDirectories.helpers,
+  helpersDirectory: viewDirectories.helpers,
 
-    environment:
-        "production",
+  environment: "production",
 
-    defaultLayout:
-        "main",
+  defaultLayout: "main",
 
-    strict:
-        false,
+  strict: false,
 
-    watch:
-        false,
+  watch: false,
 
-    cache:
-        true,
+  cache: true,
 });
 ```
 
-------------------------------------------------------------------------
+---
 
 # 51. Nine Core Implementation Priorities
 
 The Xian architecture was implemented around nine priorities:
 
-  ------------------------------------------------------------------------
+---
+
                       Priority Feature               Purpose
-  ---------------------------- --------------------- ---------------------
+
+---
+
                              1 Isolated Handlebars   Prevent global
                                instance              mutable template
                                                      state
@@ -1960,20 +1894,21 @@ The Xian architecture was implemented around nine priorities:
                                auto-registration     and discoverable
 
                              7 Better template       Improve debugging
-                               errors                
+                               errors
 
                              8 Development watcher   Automatically detect
                                                      template changes
 
                              9 Strict development    Catch missing
                                mode                  template data earlier
-  ------------------------------------------------------------------------
 
-------------------------------------------------------------------------
+---
+
+---
 
 # 52. Complete Conceptual Rendering Pipeline
 
-``` text
+```text
                      APPLICATION START
                             │
                             ▼
@@ -2021,7 +1956,7 @@ The Xian architecture was implemented around nine priorities:
                          HTML response
 ```
 
-------------------------------------------------------------------------
+---
 
 # 53. Final Summary
 
@@ -2030,7 +1965,7 @@ Handlebars.
 
 Its core responsibilities are:
 
-``` text
+```text
 Express integration
         +
 template compilation
@@ -2052,7 +1987,7 @@ structured errors
 
 The most important architectural separation is:
 
-``` text
+```text
 Express
   → pages/routes
 
@@ -2065,11 +2000,11 @@ Handlebars
 
 This lets controllers remain simple:
 
-``` js
+```js
 router.get("/", (req, res) => {
-    res.render("home", {
-        title: "Home",
-    });
+  res.render("home", {
+    title: "Home",
+  });
 });
 ```
 

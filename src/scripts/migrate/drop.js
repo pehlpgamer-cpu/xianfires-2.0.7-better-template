@@ -1,4 +1,4 @@
-import { sequelize } from "../../database/database.js";
+import { sequelize } from "../../../database/database.js";
 import { migrationCommand } from "./index.js";
 
-migrationCommand(sequelize, "drop")
+migrationCommand(sequelize, "drop");

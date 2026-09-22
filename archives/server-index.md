@@ -1,4 +1,5 @@
-# V1 
+# V1
+
 ```js
 import express from "express";
 import path from "path";
@@ -46,8 +47,8 @@ app.use((req, res, next) => {
 });
 const viewDir = {
   pages: "views/pages",
-  partials: "views/partials"
-}
+  partials: "views/partials",
+};
 app.set("views", path.join(__dirname, viewDir.pages));
 app.set("view engine", "xian");
 const partialsDir = path.join(__dirname, viewDir.partials);
@@ -72,7 +73,7 @@ fs.readdir(partialsDir, (err, files) => {
 });
 // ROUTES
 import web_router from "./routes/web.js";
-import api_v1_router from "./routes/api_v1.js"
+import api_v1_router from "./routes/api_v1.js";
 app.use("/", web_router);
 app.use("/api/v1", api_v1_router);
 if (!process.env.ELECTRON) {

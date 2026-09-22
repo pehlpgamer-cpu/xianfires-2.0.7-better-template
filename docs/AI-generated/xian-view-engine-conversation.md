@@ -79,19 +79,14 @@ This handles Priority **7 — better template errors**.
  * - column number
  */
 export class XianTemplateError extends Error {
-    constructor(message, {
-        templatePath = null,
-        cause = null,
-        line = null,
-        column = null,
-    } = {}) {
-        super(message, { cause });
+  constructor(message, { templatePath = null, cause = null, line = null, column = null } = {}) {
+    super(message, { cause });
 
-        this.name = "XianTemplateError";
-        this.templatePath = templatePath;
-        this.line = line;
-        this.column = column;
-    }
+    this.name = "XianTemplateError";
+    this.templatePath = templatePath;
+    this.line = line;
+    this.column = column;
+  }
 }
 
 /**
@@ -99,58 +94,46 @@ export class XianTemplateError extends Error {
  * a Handlebars compiler error.
  */
 function extractLocation(error) {
-    return {
-        line:
-            error?.lineNumber ??
-            error?.line ??
-            null,
+  return {
+    line: error?.lineNumber ?? error?.line ?? null,
 
-        column:
-            error?.columnNumber ??
-            error?.column ??
-            null,
-    };
+    column: error?.columnNumber ?? error?.column ?? null,
+  };
 }
 
 /**
  * Converts an arbitrary error into a XianTemplateError.
  */
 export function createTemplateError(error, templatePath) {
-    if (error instanceof XianTemplateError) {
-        return error;
-    }
+  if (error instanceof XianTemplateError) {
+    return error;
+  }
 
-    const { line, column } = extractLocation(error);
+  const { line, column } = extractLocation(error);
 
-    const location = [];
+  const location = [];
 
-    if (line !== null) {
-        location.push(`line ${line}`);
-    }
+  if (line !== null) {
+    location.push(`line ${line}`);
+  }
 
-    if (column !== null) {
-        location.push(`column ${column}`);
-    }
+  if (column !== null) {
+    location.push(`column ${column}`);
+  }
 
-    const locationText =
-        location.length > 0
-            ? ` (${location.join(", ")})`
-            : "";
+  const locationText = location.length > 0 ? ` (${location.join(", ")})` : "";
 
-    const originalMessage =
-        error instanceof Error
-            ? error.message
-            : String(error);
+  const originalMessage = error instanceof Error ? error.message : String(error);
 
-    return new XianTemplateError(
-        `Failed to render Xian template "${templatePath}"${locationText}: ${originalMessage}`,
-        {
-            templatePath,
-            cause: error,
-            line,
-            column,
-        },
-    );
+  return new XianTemplateError(
+    `Failed to render Xian template "${templatePath}"${locationText}: ${originalMessage}`,
+    {
+      templatePath,
+      cause: error,
+      line,
+      column,
+    },
+  );
 }
 ```
 
@@ -179,7 +162,7 @@ import path from "node:path";
  * Determines whether a file is a Xian template.
  */
 function isXianFile(fileName) {
-    return fileName.endsWith(".xian");
+  return fileName.endsWith(".xian");
 }
 
 /**
@@ -194,118 +177,78 @@ function isXianFile(fileName) {
  * components/button
  */
 function createPartialName(baseDirectory, filePath) {
-    const relativePath = path.relative(
-        baseDirectory,
-        filePath,
-    );
+  const relativePath = path.relative(baseDirectory, filePath);
 
-    return relativePath
-        .replace(/\.xian$/, "")
-        .split(path.sep)
-        .join("/");
+  return relativePath
+    .replace(/\.xian$/, "")
+    .split(path.sep)
+    .join("/");
 }
 
 /**
  * Recursively discovers every .xian file.
  */
 export async function findPartialFiles(directory) {
-    const entries = await fs.readdir(directory, {
-        withFileTypes: true,
-    });
+  const entries = await fs.readdir(directory, {
+    withFileTypes: true,
+  });
 
-    const files = [];
+  const files = [];
 
-    for (const entry of entries) {
-        const fullPath = path.join(
-            directory,
-            entry.name,
-        );
+  for (const entry of entries) {
+    const fullPath = path.join(directory, entry.name);
 
-        if (entry.isDirectory()) {
-            const nestedFiles =
-                await findPartialFiles(fullPath);
+    if (entry.isDirectory()) {
+      const nestedFiles = await findPartialFiles(fullPath);
 
-            files.push(...nestedFiles);
+      files.push(...nestedFiles);
 
-            continue;
-        }
-
-        if (
-            entry.isFile() &&
-            isXianFile(entry.name)
-        ) {
-            files.push(fullPath);
-        }
+      continue;
     }
 
-    return files;
+    if (entry.isFile() && isXianFile(entry.name)) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
 }
 
 /**
  * Registers one partial.
  */
-export async function registerPartial(
-    handlebars,
-    partialsDirectory,
-    filePath,
-) {
-    const content = await fs.readFile(
-        filePath,
-        "utf8",
-    );
+export async function registerPartial(handlebars, partialsDirectory, filePath) {
+  const content = await fs.readFile(filePath, "utf8");
 
-    const partialName = createPartialName(
-        partialsDirectory,
-        filePath,
-    );
+  const partialName = createPartialName(partialsDirectory, filePath);
 
-    handlebars.registerPartial(
-        partialName,
-        content,
-    );
+  handlebars.registerPartial(partialName, content);
 
-    return partialName;
+  return partialName;
 }
 
 /**
  * Recursively registers all Xian partials.
  */
-export async function registerPartials(
-    handlebars,
-    partialsDirectory,
-) {
-    const files =
-        await findPartialFiles(partialsDirectory);
+export async function registerPartials(handlebars, partialsDirectory) {
+  const files = await findPartialFiles(partialsDirectory);
 
-    for (const filePath of files) {
-        await registerPartial(
-            handlebars,
-            partialsDirectory,
-            filePath,
-        );
-    }
+  for (const filePath of files) {
+    await registerPartial(handlebars, partialsDirectory, filePath);
+  }
 
-    return files;
+  return files;
 }
 
 /**
  * Removes a partial from the Handlebars instance.
  */
-export function unregisterPartial(
-    handlebars,
-    partialsDirectory,
-    filePath,
-) {
-    const partialName = createPartialName(
-        partialsDirectory,
-        filePath,
-    );
+export function unregisterPartial(handlebars, partialsDirectory, filePath) {
+  const partialName = createPartialName(partialsDirectory, filePath);
 
-    handlebars.unregisterPartial(
-        partialName,
-    );
+  handlebars.unregisterPartial(partialName);
 
-    return partialName;
+  return partialName;
 }
 ```
 
@@ -352,7 +295,7 @@ Each file represents one helper.
 
 ```js
 export default function uppercase(value) {
-    return String(value ?? "").toUpperCase();
+  return String(value ?? "").toUpperCase();
 }
 ```
 
@@ -360,7 +303,7 @@ export default function uppercase(value) {
 
 ```js
 export default function json(value) {
-    return JSON.stringify(value);
+  return JSON.stringify(value);
 }
 ```
 
@@ -368,19 +311,16 @@ export default function json(value) {
 
 ```js
 export default function currency(value) {
-    const amount = Number(value);
+  const amount = Number(value);
 
-    if (!Number.isFinite(amount)) {
-        return "";
-    }
+  if (!Number.isFinite(amount)) {
+    return "";
+  }
 
-    return new Intl.NumberFormat(
-        "en-PH",
-        {
-            style: "currency",
-            currency: "PHP",
-        },
-    ).format(amount);
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(amount);
 }
 ```
 
@@ -397,69 +337,43 @@ import { pathToFileURL } from "node:url";
  * currency.js -> currency
  */
 function createHelperName(fileName) {
-    return fileName
-        .replace(/\.[^/.]+$/, "")
-        .replace(/[^a-zA-Z0-9_-]/g, "_");
+  return fileName.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
 /**
  * Finds helper files.
  */
 async function findHelperFiles(directory) {
-    const entries = await fs.readdir(directory, {
-        withFileTypes: true,
-    });
+  const entries = await fs.readdir(directory, {
+    withFileTypes: true,
+  });
 
-    return entries
-        .filter(
-            (entry) =>
-                entry.isFile() &&
-                /\.(js|mjs)$/.test(entry.name),
-        )
-        .map((entry) =>
-            path.join(
-                directory,
-                entry.name,
-            ),
-        );
+  return entries
+    .filter((entry) => entry.isFile() && /\.(js|mjs)$/.test(entry.name))
+    .map((entry) => path.join(directory, entry.name));
 }
 
 /**
  * Registers all helpers inside the helpers directory.
  */
-export async function registerHelpers(
-    handlebars,
-    helpersDirectory,
-) {
-    const files =
-        await findHelperFiles(helpersDirectory);
+export async function registerHelpers(handlebars, helpersDirectory) {
+  const files = await findHelperFiles(helpersDirectory);
 
-    for (const filePath of files) {
-        const module = await import(
-            pathToFileURL(filePath).href
-        );
+  for (const filePath of files) {
+    const module = await import(pathToFileURL(filePath).href);
 
-        const helperName =
-            createHelperName(
-                path.basename(filePath),
-            );
+    const helperName = createHelperName(path.basename(filePath));
 
-        const helper =
-            module.default ?? module[helperName];
+    const helper = module.default ?? module[helperName];
 
-        if (typeof helper !== "function") {
-            throw new TypeError(
-                `Helper "${filePath}" must export a function.`,
-            );
-        }
-
-        handlebars.registerHelper(
-            helperName,
-            helper,
-        );
+    if (typeof helper !== "function") {
+      throw new TypeError(`Helper "${filePath}" must export a function.`);
     }
 
-    return files;
+    handlebars.registerHelper(helperName, helper);
+  }
+
+  return files;
 }
 ```
 
@@ -483,7 +397,7 @@ Support:
 
 ```js
 res.render("home", {
-    layout: "main",
+  layout: "main",
 });
 ```
 
@@ -491,7 +405,7 @@ and:
 
 ```js
 res.render("home", {
-    layout: false,
+  layout: false,
 });
 ```
 
@@ -514,28 +428,20 @@ import path from "node:path";
 /**
  * Finds a layout file.
  */
-export async function resolveLayout(
-    layoutsDirectory,
-    layoutName,
-) {
-    if (!layoutName) {
-        return null;
-    }
+export async function resolveLayout(layoutsDirectory, layoutName) {
+  if (!layoutName) {
+    return null;
+  }
 
-    const layoutPath = path.join(
-        layoutsDirectory,
-        `${layoutName}.xian`,
-    );
+  const layoutPath = path.join(layoutsDirectory, `${layoutName}.xian`);
 
-    try {
-        await fs.access(layoutPath);
-    } catch {
-        throw new Error(
-            `Xian layout "${layoutName}" was not found at "${layoutPath}".`,
-        );
-    }
+  try {
+    await fs.access(layoutPath);
+  } catch {
+    throw new Error(`Xian layout "${layoutName}" was not found at "${layoutPath}".`);
+  }
 
-    return layoutPath;
+  return layoutPath;
 }
 ```
 
@@ -555,10 +461,7 @@ Then:
 
 ```js
 import chokidar from "chokidar";
-import {
-    registerPartial,
-    unregisterPartial,
-} from "./partials.js";
+import { registerPartial, unregisterPartial } from "./partials.js";
 
 /**
  * Watches Xian template directories.
@@ -566,93 +469,59 @@ import {
  * This should only be enabled in development.
  */
 export function watchXianFiles({
-    handlebars,
-    partialsDirectory,
-    layoutsDirectory,
-    helpersDirectory,
-    invalidateTemplate,
+  handlebars,
+  partialsDirectory,
+  layoutsDirectory,
+  helpersDirectory,
+  invalidateTemplate,
 }) {
-    const watcher = chokidar.watch(
-        [
-            partialsDirectory,
-            layoutsDirectory,
-            helpersDirectory,
-        ],
-        {
-            ignoreInitial: true,
-        },
-    );
+  const watcher = chokidar.watch([partialsDirectory, layoutsDirectory, helpersDirectory], {
+    ignoreInitial: true,
+  });
 
-    watcher.on("add", async (filePath) => {
-        try {
-            if (filePath.endsWith(".xian")) {
-                await registerPartial(
-                    handlebars,
-                    partialsDirectory,
-                    filePath,
-                );
-            }
+  watcher.on("add", async (filePath) => {
+    try {
+      if (filePath.endsWith(".xian")) {
+        await registerPartial(handlebars, partialsDirectory, filePath);
+      }
 
-            invalidateTemplate(filePath);
+      invalidateTemplate(filePath);
 
-            console.log(
-                `🔥 Xian file added: ${filePath}`,
-            );
-        } catch (error) {
-            console.error(
-                "❌ Xian watcher error:",
-                error,
-            );
-        }
-    });
+      console.log(`🔥 Xian file added: ${filePath}`);
+    } catch (error) {
+      console.error("❌ Xian watcher error:", error);
+    }
+  });
 
-    watcher.on("change", async (filePath) => {
-        try {
-            if (filePath.endsWith(".xian")) {
-                await registerPartial(
-                    handlebars,
-                    partialsDirectory,
-                    filePath,
-                );
-            }
+  watcher.on("change", async (filePath) => {
+    try {
+      if (filePath.endsWith(".xian")) {
+        await registerPartial(handlebars, partialsDirectory, filePath);
+      }
 
-            invalidateTemplate(filePath);
+      invalidateTemplate(filePath);
 
-            console.log(
-                `♻️ Xian file changed: ${filePath}`,
-            );
-        } catch (error) {
-            console.error(
-                "❌ Xian watcher error:",
-                error,
-            );
-        }
-    });
+      console.log(`♻️ Xian file changed: ${filePath}`);
+    } catch (error) {
+      console.error("❌ Xian watcher error:", error);
+    }
+  });
 
-    watcher.on("unlink", (filePath) => {
-        try {
-            if (filePath.endsWith(".xian")) {
-                unregisterPartial(
-                    handlebars,
-                    partialsDirectory,
-                    filePath,
-                );
-            }
+  watcher.on("unlink", (filePath) => {
+    try {
+      if (filePath.endsWith(".xian")) {
+        unregisterPartial(handlebars, partialsDirectory, filePath);
+      }
 
-            invalidateTemplate(filePath);
+      invalidateTemplate(filePath);
 
-            console.log(
-                `🗑️ Xian file removed: ${filePath}`,
-            );
-        } catch (error) {
-            console.error(
-                "❌ Xian watcher error:",
-                error,
-            );
-        }
-    });
+      console.log(`🗑️ Xian file removed: ${filePath}`);
+    } catch (error) {
+      console.error("❌ Xian watcher error:", error);
+    }
+  });
 
-    return watcher;
+  return watcher;
 }
 ```
 
@@ -685,404 +554,316 @@ import path from "node:path";
 
 import hbs from "hbs";
 
-import {
-    registerPartials,
-} from "./partials.js";
+import { registerPartials } from "./partials.js";
 
-import {
-    registerHelpers,
-} from "./helpers.js";
+import { registerHelpers } from "./helpers.js";
 
-import {
-    resolveLayout,
-} from "./layouts.js";
+import { resolveLayout } from "./layouts.js";
 
-import {
-    createTemplateError,
-} from "./errors.js";
+import { createTemplateError } from "./errors.js";
 
-import {
-    watchXianFiles,
-} from "./watcher.js";
-
+import { watchXianFiles } from "./watcher.js";
 
 /**
  * Creates the Xian view engine.
  */
 export async function createXianEngine({
-    partialsDirectory,
-    layoutsDirectory,
-    helpersDirectory,
+  partialsDirectory,
+  layoutsDirectory,
+  helpersDirectory,
 
-    environment = process.env.NODE_ENV ??
-        "development",
+  environment = process.env.NODE_ENV ?? "development",
 
-    defaultLayout = "main",
+  defaultLayout = "main",
 
-    strict = environment === "development",
+  strict = environment === "development",
 
-    watch = environment === "development",
+  watch = environment === "development",
 
-    cache = environment === "production",
+  cache = environment === "production",
 }) {
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 1
+   * ---------------------------------------------------------
+   *
+   * Create an isolated HBS instance.
+   *
+   * We DO NOT use the global `hbs` instance for application
+   * registrations.
+   */
+  const xian = hbs.create();
+
+  /*
+   * The actual Handlebars implementation behind this HBS
+   * instance.
+   */
+  const handlebars = xian.handlebars;
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 4
+   * ---------------------------------------------------------
+   *
+   * Application-level compiled template cache.
+   *
+   * Map:
+   *
+   * absolute file path
+   *        ↓
+   * compiled Handlebars function
+   */
+  const templateCache = new Map();
+
+  /*
+   * ---------------------------------------------------------
+   * Compile a template.
+   * ---------------------------------------------------------
+   */
+  async function compileTemplate(filePath) {
     /*
-     * ---------------------------------------------------------
-     * PRIORITY 1
-     * ---------------------------------------------------------
+     * Production:
      *
-     * Create an isolated HBS instance.
-     *
-     * We DO NOT use the global `hbs` instance for application
-     * registrations.
+     * If already compiled, reuse it.
      */
-    const xian = hbs.create();
+    if (cache && templateCache.has(filePath)) {
+      return templateCache.get(filePath);
+    }
 
-    /*
-     * The actual Handlebars implementation behind this HBS
-     * instance.
-     */
-    const handlebars = xian.handlebars;
+    const source = await fs.readFile(filePath, "utf8");
 
+    let template;
 
-    /*
-     * ---------------------------------------------------------
-     * PRIORITY 4
-     * ---------------------------------------------------------
-     *
-     * Application-level compiled template cache.
-     *
-     * Map:
-     *
-     * absolute file path
-     *        ↓
-     * compiled Handlebars function
-     */
-    const templateCache = new Map();
-
-
-    /*
-     * ---------------------------------------------------------
-     * Compile a template.
-     * ---------------------------------------------------------
-     */
-    async function compileTemplate(filePath) {
+    try {
+      template = handlebars.compile(source, {
         /*
-         * Production:
+         * PRIORITY 9
          *
-         * If already compiled, reuse it.
+         * Development strict mode detects
+         * missing properties instead of silently
+         * returning undefined.
          */
-        if (cache && templateCache.has(filePath)) {
-            return templateCache.get(filePath);
-        }
-
-        const source =
-            await fs.readFile(
-                filePath,
-                "utf8",
-            );
-
-        let template;
-
-        try {
-            template =
-                handlebars.compile(
-                    source,
-                    {
-                        /*
-                         * PRIORITY 9
-                         *
-                         * Development strict mode detects
-                         * missing properties instead of silently
-                         * returning undefined.
-                         */
-                        strict,
-
-                        /*
-                         * Keep HTML escaping enabled.
-                         */
-                        noEscape: false,
-                    },
-                );
-        } catch (error) {
-            throw createTemplateError(
-                error,
-                filePath,
-            );
-        }
+        strict,
 
         /*
-         * Cache only when enabled.
+         * Keep HTML escaping enabled.
          */
-        if (cache) {
-            templateCache.set(
-                filePath,
-                template,
-            );
-        }
-
-        return template;
+        noEscape: false,
+      });
+    } catch (error) {
+      throw createTemplateError(error, filePath);
     }
 
-
     /*
-     * ---------------------------------------------------------
-     * PRIORITY 5
-     *
-     * Render a layout around page content.
-     * ---------------------------------------------------------
+     * Cache only when enabled.
      */
-    async function renderLayout({
-        layoutName,
-        body,
-        options,
-    }) {
-        const layoutPath =
-            await resolveLayout(
-                layoutsDirectory,
-                layoutName,
-            );
-
-        const layout =
-            await compileTemplate(
-                layoutPath,
-            );
-
-        /*
-         * Put the rendered page inside `body`.
-         */
-        const layoutData = {
-            ...options,
-            body,
-        };
-
-        try {
-            return layout(
-                layoutData,
-            );
-        } catch (error) {
-            throw createTemplateError(
-                error,
-                layoutPath,
-            );
-        }
+    if (cache) {
+      templateCache.set(filePath, template);
     }
 
+    return template;
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 5
+   *
+   * Render a layout around page content.
+   * ---------------------------------------------------------
+   */
+  async function renderLayout({ layoutName, body, options }) {
+    const layoutPath = await resolveLayout(layoutsDirectory, layoutName);
+
+    const layout = await compileTemplate(layoutPath);
 
     /*
-     * ---------------------------------------------------------
-     * Express view-engine interface.
-     *
-     * Express expects:
-     *
-     * engine(filePath, options, callback)
-     * ---------------------------------------------------------
+     * Put the rendered page inside `body`.
      */
-    async function render(
-        filePath,
-        options,
-        callback,
-    ) {
-        try {
-            /*
-             * Compile page.
-             */
-            const template =
-                await compileTemplate(
-                    filePath,
-                );
-
-            /*
-             * Express puts request locals inside
-             * options._locals.
-             *
-             * We don't want to expose Express internals
-             * directly as template data.
-             */
-            const templateData = {
-                ...options,
-                ...(options?._locals ?? {}),
-            };
-
-            /*
-             * -------------------------------------------------
-             * Render page first.
-             * -------------------------------------------------
-             */
-            const pageHtml =
-                template(
-                    templateData,
-                );
-
-            /*
-             * -------------------------------------------------
-             * PRIORITY 5
-             *
-             * Layout selection.
-             * -------------------------------------------------
-             *
-             * layout: false
-             *     => no layout
-             *
-             * layout: "main"
-             *     => views/layouts/main.xian
-             *
-             * otherwise
-             *     => default layout
-             */
-            const requestedLayout =
-                options?.layout === false
-                    ? null
-                    : options?.layout ??
-                      defaultLayout;
-
-            if (!requestedLayout) {
-                callback(
-                    null,
-                    pageHtml,
-                );
-
-                return;
-            }
-
-            const html =
-                await renderLayout({
-                    layoutName:
-                        requestedLayout,
-
-                    body: pageHtml,
-
-                    options: templateData,
-                });
-
-            callback(
-                null,
-                html,
-            );
-        } catch (error) {
-            const xianError =
-                createTemplateError(
-                    error,
-                    filePath,
-                );
-
-            callback(
-                xianError,
-            );
-        }
-    }
-
-
-    /*
-     * ---------------------------------------------------------
-     * PRIORITY 8
-     *
-     * Invalidate cached templates when files change.
-     * ---------------------------------------------------------
-     */
-    function invalidateTemplate(filePath) {
-        templateCache.delete(
-            filePath,
-        );
-    }
-
-
-    /*
-     * ---------------------------------------------------------
-     * PRIORITY 2
-     *
-     * Register partials BEFORE the application starts.
-     *
-     * This is why createXianEngine() is async.
-     * ---------------------------------------------------------
-     */
-    await registerPartials(
-        handlebars,
-        partialsDirectory,
-    );
-
-
-    /*
-     * ---------------------------------------------------------
-     * PRIORITY 6
-     *
-     * Register helpers BEFORE the application starts.
-     * ---------------------------------------------------------
-     */
-    await registerHelpers(
-        handlebars,
-        helpersDirectory,
-    );
-
-
-    /*
-     * ---------------------------------------------------------
-     * PRIORITY 8
-     *
-     * Start development watcher.
-     * ---------------------------------------------------------
-     */
-    let watcher = null;
-
-    if (watch) {
-        watcher =
-            watchXianFiles({
-                handlebars,
-
-                partialsDirectory,
-
-                layoutsDirectory,
-
-                helpersDirectory,
-
-                invalidateTemplate,
-            });
-    }
-
-
-    /*
-     * ---------------------------------------------------------
-     * Return public engine API.
-     * ---------------------------------------------------------
-     */
-    return {
-        /*
-         * Express-compatible engine.
-         *
-         * app.engine("xian", engine.engine)
-         */
-        engine: render,
-
-        /*
-         * Raw HBS instance.
-         *
-         * Useful if you need to manually register something.
-         */
-        hbs: xian,
-
-        /*
-         * Underlying Handlebars instance.
-         */
-        handlebars,
-
-        /*
-         * Cache.
-         */
-        templateCache,
-
-        /*
-         * Manually invalidate one template.
-         */
-        invalidateTemplate,
-
-        /*
-         * Stop watcher.
-         */
-        async close() {
-            if (watcher) {
-                await watcher.close();
-            }
-        },
+    const layoutData = {
+      ...options,
+      body,
     };
+
+    try {
+      return layout(layoutData);
+    } catch (error) {
+      throw createTemplateError(error, layoutPath);
+    }
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * Express view-engine interface.
+   *
+   * Express expects:
+   *
+   * engine(filePath, options, callback)
+   * ---------------------------------------------------------
+   */
+  async function render(filePath, options, callback) {
+    try {
+      /*
+       * Compile page.
+       */
+      const template = await compileTemplate(filePath);
+
+      /*
+       * Express puts request locals inside
+       * options._locals.
+       *
+       * We don't want to expose Express internals
+       * directly as template data.
+       */
+      const templateData = {
+        ...options,
+        ...(options?._locals ?? {}),
+      };
+
+      /*
+       * -------------------------------------------------
+       * Render page first.
+       * -------------------------------------------------
+       */
+      const pageHtml = template(templateData);
+
+      /*
+       * -------------------------------------------------
+       * PRIORITY 5
+       *
+       * Layout selection.
+       * -------------------------------------------------
+       *
+       * layout: false
+       *     => no layout
+       *
+       * layout: "main"
+       *     => views/layouts/main.xian
+       *
+       * otherwise
+       *     => default layout
+       */
+      const requestedLayout = options?.layout === false ? null : (options?.layout ?? defaultLayout);
+
+      if (!requestedLayout) {
+        callback(null, pageHtml);
+
+        return;
+      }
+
+      const html = await renderLayout({
+        layoutName: requestedLayout,
+
+        body: pageHtml,
+
+        options: templateData,
+      });
+
+      callback(null, html);
+    } catch (error) {
+      const xianError = createTemplateError(error, filePath);
+
+      callback(xianError);
+    }
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 8
+   *
+   * Invalidate cached templates when files change.
+   * ---------------------------------------------------------
+   */
+  function invalidateTemplate(filePath) {
+    templateCache.delete(filePath);
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 2
+   *
+   * Register partials BEFORE the application starts.
+   *
+   * This is why createXianEngine() is async.
+   * ---------------------------------------------------------
+   */
+  await registerPartials(handlebars, partialsDirectory);
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 6
+   *
+   * Register helpers BEFORE the application starts.
+   * ---------------------------------------------------------
+   */
+  await registerHelpers(handlebars, helpersDirectory);
+
+  /*
+   * ---------------------------------------------------------
+   * PRIORITY 8
+   *
+   * Start development watcher.
+   * ---------------------------------------------------------
+   */
+  let watcher = null;
+
+  if (watch) {
+    watcher = watchXianFiles({
+      handlebars,
+
+      partialsDirectory,
+
+      layoutsDirectory,
+
+      helpersDirectory,
+
+      invalidateTemplate,
+    });
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * Return public engine API.
+   * ---------------------------------------------------------
+   */
+  return {
+    /*
+     * Express-compatible engine.
+     *
+     * app.engine("xian", engine.engine)
+     */
+    engine: render,
+
+    /*
+     * Raw HBS instance.
+     *
+     * Useful if you need to manually register something.
+     */
+    hbs: xian,
+
+    /*
+     * Underlying Handlebars instance.
+     */
+    handlebars,
+
+    /*
+     * Cache.
+     */
+    templateCache,
+
+    /*
+     * Manually invalidate one template.
+     */
+    invalidateTemplate,
+
+    /*
+     * Stop watcher.
+     */
+    async close() {
+      if (watcher) {
+        await watcher.close();
+      }
+    },
+  };
 }
 ```
 
@@ -1093,13 +874,9 @@ export async function createXianEngine({
 This gives a clean public entry point.
 
 ```js
-export {
-    createXianEngine,
-} from "./engine.js";
+export { createXianEngine } from "./engine.js";
 
-export {
-    XianTemplateError,
-} from "./errors.js";
+export { XianTemplateError } from "./errors.js";
 ```
 
 The rest of the application doesn't need to know about the internal Xian files.
@@ -1119,25 +896,19 @@ import flash from "connect-flash";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
-import {
-    createXianEngine,
-} from "./xian/index.js";
+import { createXianEngine } from "./xian/index.js";
 
 import webRouter from "./routes/web.js";
 import apiV1Router from "./routes/api_v1.js";
-
 
 /*
  * ---------------------------------------------------------
  * ES module directory information.
  * ---------------------------------------------------------
  */
-const __filename =
-    fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 
-const __dirname =
-    dirname(__filename);
-
+const __dirname = dirname(__filename);
 
 /*
  * ---------------------------------------------------------
@@ -1146,13 +917,9 @@ const __dirname =
  */
 const app = express();
 
-const PORT =
-    process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3000;
 
-const NODE_ENV =
-    process.env.NODE_ENV ??
-    "development";
-
+const NODE_ENV = process.env.NODE_ENV ?? "development";
 
 /*
  * ---------------------------------------------------------
@@ -1160,27 +927,14 @@ const NODE_ENV =
  * ---------------------------------------------------------
  */
 const viewDirectories = {
-    pages: path.join(
-        __dirname,
-        "../views/pages",
-    ),
+  pages: path.join(__dirname, "../views/pages"),
 
-    partials: path.join(
-        __dirname,
-        "../views/partials",
-    ),
+  partials: path.join(__dirname, "../views/partials"),
 
-    layouts: path.join(
-        __dirname,
-        "../views/layouts",
-    ),
+  layouts: path.join(__dirname, "../views/layouts"),
 
-    helpers: path.join(
-        __dirname,
-        "../views/helpers",
-    ),
+  helpers: path.join(__dirname, "../views/helpers"),
 };
-
 
 /*
  * ---------------------------------------------------------
@@ -1188,25 +942,15 @@ const viewDirectories = {
  * ---------------------------------------------------------
  */
 
-app.use(
-    express.json(),
-);
+app.use(express.json());
 
 app.use(
-    express.urlencoded({
-        extended: true,
-    }),
+  express.urlencoded({
+    extended: true,
+  }),
 );
 
-app.use(
-    express.static(
-        path.join(
-            process.cwd(),
-            "public",
-        ),
-    ),
-);
-
+app.use(express.static(path.join(process.cwd(), "public")));
 
 /*
  * ---------------------------------------------------------
@@ -1215,17 +959,14 @@ app.use(
  */
 
 app.use(
-    session({
-        secret:
-            process.env.SECRET_KEY ??
-            "development-secret",
+  session({
+    secret: process.env.SECRET_KEY ?? "development-secret",
 
-        resave: false,
+    resave: false,
 
-        saveUninitialized: false,
-    }),
+    saveUninitialized: false,
+  }),
 );
-
 
 /*
  * ---------------------------------------------------------
@@ -1233,10 +974,7 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    flash(),
-);
-
+app.use(flash());
 
 /*
  * ---------------------------------------------------------
@@ -1244,22 +982,13 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    (req, res, next) => {
-        res.locals.success_msg =
-            req.flash(
-                "success_msg",
-            );
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
 
-        res.locals.error_msg =
-            req.flash(
-                "error_msg",
-            );
+  res.locals.error_msg = req.flash("error_msg");
 
-        next();
-    },
-);
-
+  next();
+});
 
 /*
  * ---------------------------------------------------------
@@ -1267,16 +996,9 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    "/",
-    webRouter,
-);
+app.use("/", webRouter);
 
-app.use(
-    "/api/v1",
-    apiV1Router,
-);
-
+app.use("/api/v1", apiV1Router);
 
 /*
  * ---------------------------------------------------------
@@ -1290,94 +1012,63 @@ app.use(
  * ---------------------------------------------------------
  */
 async function bootstrap() {
-    const xian =
-        await createXianEngine({
-            partialsDirectory:
-                viewDirectories.partials,
+  const xian = await createXianEngine({
+    partialsDirectory: viewDirectories.partials,
 
-            layoutsDirectory:
-                viewDirectories.layouts,
+    layoutsDirectory: viewDirectories.layouts,
 
-            helpersDirectory:
-                viewDirectories.helpers,
+    helpersDirectory: viewDirectories.helpers,
 
-            environment:
-                NODE_ENV,
-
-            /*
-             * Default layout.
-             */
-            defaultLayout:
-                "main",
-
-            /*
-             * Strict mode:
-             *
-             * development = true
-             * production = false
-             */
-            strict:
-                NODE_ENV ===
-                "development",
-
-            /*
-             * Watch files only in development.
-             */
-            watch:
-                NODE_ENV ===
-                "development",
-
-            /*
-             * Cache compiled templates in production.
-             */
-            cache:
-                NODE_ENV ===
-                "production",
-        });
-
+    environment: NODE_ENV,
 
     /*
-     * ---------------------------------------------------------
-     * Register Xian as the Express view engine.
-     * ---------------------------------------------------------
+     * Default layout.
      */
-    app.engine(
-        "xian",
-        xian.engine,
-    );
-
-    app.set(
-        "views",
-        viewDirectories.pages,
-    );
-
-    app.set(
-        "view engine",
-        "xian",
-    );
-
+    defaultLayout: "main",
 
     /*
-     * ---------------------------------------------------------
-     * Start HTTP server.
-     * ---------------------------------------------------------
+     * Strict mode:
+     *
+     * development = true
+     * production = false
      */
-    if (!process.env.ELECTRON) {
-        app.listen(
-            PORT,
-            () => {
-                console.log(
-                    `🔥 XianFire running at http://localhost:${PORT}`,
-                );
+    strict: NODE_ENV === "development",
 
-                console.log(
-                    `🔥 Xian environment: ${NODE_ENV}`,
-                );
-            },
-        );
-    }
+    /*
+     * Watch files only in development.
+     */
+    watch: NODE_ENV === "development",
+
+    /*
+     * Cache compiled templates in production.
+     */
+    cache: NODE_ENV === "production",
+  });
+
+  /*
+   * ---------------------------------------------------------
+   * Register Xian as the Express view engine.
+   * ---------------------------------------------------------
+   */
+  app.engine("xian", xian.engine);
+
+  app.set("views", viewDirectories.pages);
+
+  app.set("view engine", "xian");
+
+  /*
+   * ---------------------------------------------------------
+   * Start HTTP server.
+   * ---------------------------------------------------------
+   */
+  if (!process.env.ELECTRON) {
+    app.listen(PORT, () => {
+      console.log(`🔥 XianFire running at http://localhost:${PORT}`);
+
+      console.log(`🔥 Xian environment: ${NODE_ENV}`);
+    });
+  }
 }
-
 
 /*
  * ---------------------------------------------------------
@@ -1385,14 +1076,10 @@ async function bootstrap() {
  * ---------------------------------------------------------
  */
 bootstrap().catch((error) => {
-    console.error(
-        "❌ Failed to start XianFire:",
-        error,
-    );
+  console.error("❌ Failed to start XianFire:", error);
 
-    process.exitCode = 1;
+  process.exitCode = 1;
 });
-
 
 export default app;
 ```
@@ -1460,17 +1147,17 @@ views/partials/navbar.xian
 
 ```hbs
 <nav>
-    <a href="/">
-        XianFire
-    </a>
+  <a href="/">
+    XianFire
+  </a>
 
-    <a href="/products">
-        Products
-    </a>
+  <a href="/products">
+    Products
+  </a>
 
-    <a href="/login">
-        Login
-    </a>
+  <a href="/login">
+    Login
+  </a>
 </nav>
 ```
 
@@ -1485,17 +1172,17 @@ views/partials/components/card.xian
 ```hbs
 <article class="card">
 
-    <h2>
-        {{title}}
-    </h2>
+  <h2>
+    {{title}}
+  </h2>
 
-    <p>
-        {{description}}
-    </p>
+  <p>
+    {{description}}
+  </p>
 
-    <strong>
-        {{currency price}}
-    </strong>
+  <strong>
+    {{currency price}}
+  </strong>
 
 </article>
 ```
@@ -1542,9 +1229,9 @@ Route:
 
 ```js
 router.get("/", (req, res) => {
-    res.render("home", {
-        title: "Home",
-    });
+  res.render("home", {
+    title: "Home",
+  });
 });
 ```
 
@@ -1596,17 +1283,11 @@ views/
 Route:
 
 ```js
-router.get(
-    "/admin/users",
-    (req, res) => {
-        res.render(
-            "admin/users/index",
-            {
-                title: "Users",
-            },
-        );
-    },
-);
+router.get("/admin/users", (req, res) => {
+  res.render("admin/users/index", {
+    title: "Users",
+  });
+});
 ```
 
 Express resolves:
@@ -1622,13 +1303,10 @@ A recursive page loader is unnecessary because Express resolves view paths relat
 # 15. Disable the layout
 
 ```js
-res.render(
-    "admin/login",
-    {
-        title: "Login",
-        layout: false,
-    },
-);
+res.render("admin/login", {
+  title: "Login",
+  layout: false,
+});
 ```
 
 Result:
@@ -1658,13 +1336,10 @@ views/layouts/
 Then:
 
 ```js
-res.render(
-    "admin/dashboard",
-    {
-        title: "Dashboard",
-        layout: "admin",
-    },
-);
+res.render("admin/dashboard", {
+  title: "Dashboard",
+  layout: "admin",
+});
 ```
 
 Result:
@@ -1684,7 +1359,7 @@ admin/dashboard.xian
 ### Development
 
 ```js
-cache: false
+cache: false;
 ```
 
 Every render reads the `.xian` file again:
@@ -1702,7 +1377,7 @@ render
 ### Production
 
 ```js
-cache: true
+cache: true;
 ```
 
 First request:
@@ -1766,14 +1441,14 @@ new partial is immediately available
 Development:
 
 ```js
-strict: true
+strict: true;
 ```
 
 Template:
 
 ```hbs
 <h1>
-    {{user.name}}
+  {{user.name}}
 </h1>
 ```
 
@@ -1781,7 +1456,7 @@ Controller:
 
 ```js
 res.render("home", {
-    user: {},
+  user: {},
 });
 ```
 
@@ -1901,7 +1576,7 @@ app.use((req, res, next) => {
 
 const viewDir = {
   pages: "views/pages",
-  partials: "views/partials"
+  partials: "views/partials",
 };
 
 app.set("views", path.join(__dirname, viewDir.pages));
@@ -1933,15 +1608,13 @@ fs.readdir(partialsDir, (err, files) => {
 });
 
 import web_router from "./routes/web.js";
-import api_v1_router from "./routes/api_v1.js"
+import api_v1_router from "./routes/api_v1.js";
 
 app.use("/", web_router);
 app.use("/api/v1", api_v1_router);
 
 if (!process.env.ELECTRON) {
-  app.listen(PORT, () =>
-    console.log(`🔥 XianFire running at http://localhost:${PORT}`)
-  );
+  app.listen(PORT, () => console.log(`🔥 XianFire running at http://localhost:${PORT}`));
 }
 
 export default app;

@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs/promises";
 import { toPascalCase, ensureDir } from "../utils.js";
 
-
 // Generate Model (Sequelize for MySQL, Mongoose for MongoDB, Firestore helpers for Firebase)
 export const createModel = async (modelName) => {
   const modelDir = path.join(process.cwd(), "models");

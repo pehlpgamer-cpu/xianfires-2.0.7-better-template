@@ -13,8 +13,6 @@
 // }
 // export function routeBuilder(router, listOfRouteData) {}
 
-
-
 // EXAMPLE in `route/web.js`
 // import { routeBuilder, route } from "../utils/routing.js"
 // routeBuilder(router, [{

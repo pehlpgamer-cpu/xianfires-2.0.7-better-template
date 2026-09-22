@@ -5,7 +5,7 @@ import path from "node:path";
  * Determines whether a file is a Xian template.
  */
 function isXianFile(fileName) {
-    return fileName.endsWith(".xian");
+  return fileName.endsWith(".xian");
 }
 
 /**
@@ -20,116 +20,76 @@ function isXianFile(fileName) {
  * components/button
  */
 function createPartialName(baseDirectory, filePath) {
-    const relativePath = path.relative(
-        baseDirectory,
-        filePath,
-    );
+  const relativePath = path.relative(baseDirectory, filePath);
 
-    return relativePath
-        .replace(/\.xian$/, "")
-        .split(path.sep)
-        .join("/");
+  return relativePath
+    .replace(/\.xian$/, "")
+    .split(path.sep)
+    .join("/");
 }
 
 /**
  * Recursively discovers every .xian file.
  */
 export async function findPartialFiles(directory) {
-    const entries = await fs.readdir(directory, {
-        withFileTypes: true,
-    });
+  const entries = await fs.readdir(directory, {
+    withFileTypes: true,
+  });
 
-    const files = [];
+  const files = [];
 
-    for (const entry of entries) {
-        const fullPath = path.join(
-            directory,
-            entry.name,
-        );
+  for (const entry of entries) {
+    const fullPath = path.join(directory, entry.name);
 
-        if (entry.isDirectory()) {
-            const nestedFiles =
-                await findPartialFiles(fullPath);
+    if (entry.isDirectory()) {
+      const nestedFiles = await findPartialFiles(fullPath);
 
-            files.push(...nestedFiles);
+      files.push(...nestedFiles);
 
-            continue;
-        }
-
-        if (
-            entry.isFile() &&
-            isXianFile(entry.name)
-        ) {
-            files.push(fullPath);
-        }
+      continue;
     }
 
-    return files;
+    if (entry.isFile() && isXianFile(entry.name)) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
 }
 
 /**
  * Registers one partial.
  */
-export async function registerPartial(
-    handlebars,
-    partialsDirectory,
-    filePath,
-) {
-    const content = await fs.readFile(
-        filePath,
-        "utf8",
-    );
+export async function registerPartial(handlebars, partialsDirectory, filePath) {
+  const content = await fs.readFile(filePath, "utf8");
 
-    const partialName = createPartialName(
-        partialsDirectory,
-        filePath,
-    );
+  const partialName = createPartialName(partialsDirectory, filePath);
 
-    handlebars.registerPartial(
-        partialName,
-        content,
-    );
+  handlebars.registerPartial(partialName, content);
 
-    return partialName;
+  return partialName;
 }
 
 /**
  * Recursively registers all Xian partials.
  */
-export async function registerPartials(
-    handlebars,
-    partialsDirectory,
-) {
-    const files =
-        await findPartialFiles(partialsDirectory);
+export async function registerPartials(handlebars, partialsDirectory) {
+  const files = await findPartialFiles(partialsDirectory);
 
-    for (const filePath of files) {
-        await registerPartial(
-            handlebars,
-            partialsDirectory,
-            filePath,
-        );
-    }
+  for (const filePath of files) {
+    await registerPartial(handlebars, partialsDirectory, filePath);
+  }
 
-    return files;
+  return files;
 }
 
 /**
  * Removes a partial from the Handlebars instance.
  */
-export function unregisterPartial(
-    handlebars,
-    partialsDirectory,
-    filePath,
-) {
-    const partialName = createPartialName(
-        partialsDirectory,
-        filePath,
-    );
+export function unregisterPartial(handlebars, partialsDirectory, filePath) {
+  const partialName = createPartialName(partialsDirectory, filePath);
 
-    handlebars.unregisterPartial(
-        partialName,
-    );
+  handlebars.unregisterPartial(partialName);
 
-    return partialName;
+  return partialName;
 }

@@ -6,25 +6,19 @@ import flash from "connect-flash";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
-import {
-    createXianEngine,
-} from "./xian/index.js";
+import { createXianEngine } from "./xian/index.js";
 
 import webRouter from "../routes/web.js";
 import apiV1Router from "../routes/api_v1.js";
-
 
 /*
  * ---------------------------------------------------------
  * ES module directory information.
  * ---------------------------------------------------------
  */
-const __filename =
-    fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 
-const __dirname =
-    dirname(__filename);
-
+const __dirname = dirname(__filename);
 
 /*
  * ---------------------------------------------------------
@@ -33,13 +27,9 @@ const __dirname =
  */
 const app = express();
 
-const PORT =
-    process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3000;
 
-const NODE_ENV =
-    process.env.NODE_ENV ??
-    "development";
-
+const NODE_ENV = process.env.NODE_ENV ?? "development";
 
 /*
  * ---------------------------------------------------------
@@ -47,27 +37,14 @@ const NODE_ENV =
  * ---------------------------------------------------------
  */
 const viewDirectories = {
-    pages: path.join(
-        __dirname,
-        "../views/pages",
-    ),
+  pages: path.join(__dirname, "../views/pages"),
 
-    partials: path.join(
-        __dirname,
-        "../views/partials",
-    ),
+  partials: path.join(__dirname, "../views/partials"),
 
-    layouts: path.join(
-        __dirname,
-        "../views/layouts",
-    ),
+  layouts: path.join(__dirname, "../views/layouts"),
 
-    helpers: path.join(
-        __dirname,
-        "../views/helpers",
-    ),
+  helpers: path.join(__dirname, "../views/helpers"),
 };
-
 
 /*
  * ---------------------------------------------------------
@@ -75,25 +52,15 @@ const viewDirectories = {
  * ---------------------------------------------------------
  */
 
-app.use(
-    express.json(),
-);
+app.use(express.json());
 
 app.use(
-    express.urlencoded({
-        extended: true,
-    }),
+  express.urlencoded({
+    extended: true,
+  }),
 );
 
-app.use(
-    express.static(
-        path.join(
-            process.cwd(),
-            "public",
-        ),
-    ),
-);
-
+app.use(express.static(path.join(process.cwd(), "public")));
 
 /*
  * ---------------------------------------------------------
@@ -102,17 +69,14 @@ app.use(
  */
 
 app.use(
-    session({
-        secret:
-            process.env.SECRET_KEY ??
-            "development-secret",
+  session({
+    secret: process.env.SECRET_KEY ?? "development-secret",
 
-        resave: false,
+    resave: false,
 
-        saveUninitialized: false,
-    }),
+    saveUninitialized: false,
+  }),
 );
-
 
 /*
  * ---------------------------------------------------------
@@ -120,10 +84,7 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    flash(),
-);
-
+app.use(flash());
 
 /*
  * ---------------------------------------------------------
@@ -131,22 +92,13 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    (req, res, next) => {
-        res.locals.success_msg =
-            req.flash(
-                "success_msg",
-            );
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
 
-        res.locals.error_msg =
-            req.flash(
-                "error_msg",
-            );
+  res.locals.error_msg = req.flash("error_msg");
 
-        next();
-    },
-);
-
+  next();
+});
 
 /*
  * ---------------------------------------------------------
@@ -154,16 +106,9 @@ app.use(
  * ---------------------------------------------------------
  */
 
-app.use(
-    "/",
-    webRouter,
-);
+app.use("/", webRouter);
 
-app.use(
-    "/api/v1",
-    apiV1Router,
-);
-
+app.use("/api/v1", apiV1Router);
 
 /*
  * ---------------------------------------------------------
@@ -177,94 +122,63 @@ app.use(
  * ---------------------------------------------------------
  */
 async function bootstrap() {
-    const xian =
-        await createXianEngine({
-            partialsDirectory:
-                viewDirectories.partials,
+  const xian = await createXianEngine({
+    partialsDirectory: viewDirectories.partials,
 
-            layoutsDirectory:
-                viewDirectories.layouts,
+    layoutsDirectory: viewDirectories.layouts,
 
-            helpersDirectory:
-                viewDirectories.helpers,
+    helpersDirectory: viewDirectories.helpers,
 
-            environment:
-                NODE_ENV,
-
-            /*
-             * Default layout.
-             */
-            defaultLayout:
-                "main",
-
-            /*
-             * Strict mode:
-             *
-             * development = true
-             * production = false
-             */
-            strict:
-                NODE_ENV ===
-                "development",
-
-            /*
-             * Watch files only in development.
-             */
-            watch:
-                NODE_ENV ===
-                "development",
-
-            /*
-             * Cache compiled templates in production.
-             */
-            cache:
-                NODE_ENV ===
-                "production",
-        });
-
+    environment: NODE_ENV,
 
     /*
-     * ---------------------------------------------------------
-     * Register Xian as the Express view engine.
-     * ---------------------------------------------------------
+     * Default layout.
      */
-    app.engine(
-        "xian",
-        xian.engine,
-    );
-
-    app.set(
-        "views",
-        viewDirectories.pages,
-    );
-
-    app.set(
-        "view engine",
-        "xian",
-    );
-
+    defaultLayout: "main",
 
     /*
-     * ---------------------------------------------------------
-     * Start HTTP server.
-     * ---------------------------------------------------------
+     * Strict mode:
+     *
+     * development = true
+     * production = false
      */
-    if (!process.env.ELECTRON) {
-        app.listen(
-            PORT,
-            () => {
-                console.log(
-                    `🔥 XianFire running at http://localhost:${PORT}`,
-                );
+    strict: NODE_ENV === "development",
 
-                console.log(
-                    `🔥 Xian environment: ${NODE_ENV}`,
-                );
-            },
-        );
-    }
+    /*
+     * Watch files only in development.
+     */
+    watch: NODE_ENV === "development",
+
+    /*
+     * Cache compiled templates in production.
+     */
+    cache: NODE_ENV === "production",
+  });
+
+  /*
+   * ---------------------------------------------------------
+   * Register Xian as the Express view engine.
+   * ---------------------------------------------------------
+   */
+  app.engine("xian", xian.engine);
+
+  app.set("views", viewDirectories.pages);
+
+  app.set("view engine", "xian");
+
+  /*
+   * ---------------------------------------------------------
+   * Start HTTP server.
+   * ---------------------------------------------------------
+   */
+  if (!process.env.ELECTRON) {
+    app.listen(PORT, () => {
+      console.log(`🔥 XianFire running at http://localhost:${PORT}`);
+
+      console.log(`🔥 Xian environment: ${NODE_ENV}`);
+    });
+  }
 }
-
 
 /*
  * ---------------------------------------------------------
@@ -272,13 +186,9 @@ async function bootstrap() {
  * ---------------------------------------------------------
  */
 bootstrap().catch((error) => {
-    console.error(
-        "❌ Failed to start XianFire:",
-        error,
-    );
+  console.error("❌ Failed to start XianFire:", error);
 
-    process.exitCode = 1;
+  process.exitCode = 1;
 });
-
 
 export default app;

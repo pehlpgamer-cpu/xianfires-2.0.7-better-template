@@ -20,5 +20,4 @@ router.get("/products/:id", productController.show);
 router.get("/products", productController.index);
 router.post("/products", productController.store);
 
-
 export default router;

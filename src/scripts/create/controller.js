@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs/promises";
 import { toCamelCase, toPascalCase, ensureDir } from "../utils.js";
 
-
 // Generate Express Controller (named exports)
 export const createController = async (controllerName) => {
   const controllerDir = path.join(process.cwd(), "controllers");
