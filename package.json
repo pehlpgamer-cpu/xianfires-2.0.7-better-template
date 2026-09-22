@@ -27,7 +27,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "test": "node bin/test.js; npm run test:dep",
-    "test:dep": "test:dep:quick; test:dep:html, test:dep:matrix",
+    "test:dep": "test:dep:quick; test:dep:html; test:dep:matrix;",
     "test:dep:quick": "npx dependency-cruiser app database routes tests config src",
     "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests config src",
     "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests config src"
