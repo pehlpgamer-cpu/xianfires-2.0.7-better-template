@@ -10,13 +10,13 @@
   "scripts": {
     "start": "node ./src/app.js",
     "xian": "nodemon ./src/app.js",
-    "migrate": "node ./scripts/migrate/migrate.js",
-    "migrate:fresh": "node ./scripts/migrate/fresh.js",
-    "migrate:drop": "node ./scripts/migrate/drop.js",
-    "create:model": "node ./scripts/create/index.js model",
-    "create:controller": "node ./scripts/create/index.js controller",
-    "route:list": "node ./scripts/list-routes.js",
-    "route:cache": "node ./scripts/route-cache.js",
+    "migrate": "node ./src/scripts/migrate/migrate.js",
+    "migrate:fresh": "node ./src/scripts/migrate/fresh.js",
+    "migrate:drop": "node ./src/scripts/migrate/drop.js",
+    "create:model": "node ./src/scripts/create/index.js model",
+    "create:controller": "node ./src/scripts/create/index.js controller",
+    "route:list": "node ./src/scripts/list-routes.js",
+    "route:cache": "node ./src/scripts/route-cache.js",
     "electron": "electron .",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
     "build": "electron-builder",
@@ -28,9 +28,9 @@
     "lint:fix": "oxlint --fix",
     "test": "node bin/test.js; npm run test:dep",
     "test:dep": "test:dep:quick; test:dep:html, test:dep:matrix",
-    "test:dep:quick": "npx dependency-cruiser app database routes tests scripts config src",
-    "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests scripts config src",
-    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests scripts config src"
+    "test:dep:quick": "npx dependency-cruiser app database routes tests config src",
+    "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests config src",
+    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests config src"
   },
   "dependencies": {
     "argon2": "^0.45.1",
