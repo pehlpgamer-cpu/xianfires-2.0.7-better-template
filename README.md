@@ -94,8 +94,6 @@ $extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "s
 - Electron implementation.
 - Incomplete docs.
 - Auth & Product logic.
-- Partials can't work with nested files.
-- `./index.js` is still messy.
 - database seeder.
 - no ratelimit.
 - `npm run create:` is incomplete & messy.
@@ -104,7 +102,7 @@ $extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "s
 # AI generated 
 ## AI slop
 - `list-routes.js` 
-- `./index.js` xian view engine
+- `src/*` massive overhaul of xian view engine.
 
 ## Partial
 - `sequelize` implementation because `sequelize-cli` is buggy, docs are in CommonJS style, so had I to make a workaround.

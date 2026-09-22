@@ -1,4 +1,4 @@
-{{> head}}
+
 <body class="bg-gray-50">
   <div class="flex justify-center mt-10">
     <form class="flex flex-col w-96 p-6 border rounded-lg shadow" method="POST" action="/login">
@@ -9,4 +9,3 @@
       <a href="/register" class="text-blue-700 mt-2 text-center">Don't have an account? Register</a>
     </form>
   </div>
-{{> footer }}
