@@ -8,8 +8,8 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
-    "start": "node index.js",
-    "xian": "nodemon index.js",
+    "start": "node ./src/app.js",
+    "xian": "nodemon ./src/app.js",
     "migrate": "node ./scripts/migrate/migrate.js",
     "migrate:fresh": "node ./scripts/migrate/fresh.js",
     "migrate:drop": "node ./scripts/migrate/drop.js",
@@ -28,13 +28,14 @@
     "lint:fix": "oxlint --fix",
     "test": "node bin/test.js; npm run test:dep",
     "test:dep": "test:dep:quick; test:dep:html, test:dep:matrix",
-    "test:dep:quick": "npx dependency-cruiser app database routes index.js tests scripts config",
-    "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes index.js tests scripts config",
-    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes index.js tests scripts config"
+    "test:dep:quick": "npx dependency-cruiser app database routes tests scripts config src",
+    "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests scripts config src",
+    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests scripts config src"
   },
   "dependencies": {
     "argon2": "^0.45.1",
     "bcrypt": "^5.1.0",
+    "chokidar": "^5.0.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
