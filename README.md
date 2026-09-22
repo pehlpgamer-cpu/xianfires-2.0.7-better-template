@@ -1,8 +1,7 @@
 - **status:** ⚠️ INCOMPLETE 
 - **framework:** `XianFires 2.0.7` https://www.npmjs.com/package/xianfires
 
-An improved version of XainFire framework that follows best practices, provides better examples & includes modern packages to improve developer experience while still being very similar to the original.  
-
+> An improved version of XainFire framework that follows best practices, provides better examples & includes modern packages to improve developer experience while still being very similar to the original.  
 
 # Quick Start
 
@@ -63,14 +62,19 @@ $extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "s
 # Documentation
 - [overview](./docs/overview.md)
 - [scripts](./docs/scripts.md)
-- [routes](./docs/routes.md) 🚧WIP🚧
-- [controller](./docs/controllers.md) 🚧WIP🚧
-- [validation](./docs/validation.md) 🚧WIP🚧
-- [model](./docs/models.md) 🚧WIP🚧
-- [view](./docs/views.md) 🚧WIP🚧
-- [tests](./docs/tests.md) 🚧WIP🚧
-- [middleware](./docs/middelware.md) 🚧WIP🚧
-- [miscellaneous](./docs/) 🚧WIP🚧
+- AI Generated
+  - [xian view engine refactor conversation](./docs/AI-generated/xian-view-engine-conversation.md)
+  - [xian view engine - documentation](./docs/AI-generated/xian-template-engine-documentation.md)
+
+> WIP...
+<!-- - [routes](./docs/routes.md) 
+- [controller](./docs/controllers.md) 
+- [validation](./docs/validation.md) 
+- [model](./docs/models.md) 
+- [view](./docs/views.md) 
+- [tests](./docs/tests.md) 
+- [middleware](./docs/middelware.md) 
+- [miscellaneous](./docs/)  -->
 
 
 # Packages
