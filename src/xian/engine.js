@@ -70,11 +70,7 @@ export async function createXianEngine({
    * ---------------------------------------------------------
    */
   async function compileTemplate(filePath) {
-    /*
-     * Production:
-     *
-     * If already compiled, reuse it.
-     */
+    // Production: If already compiled, reuse it.
     if (cache && templateCache.has(filePath)) {
       return templateCache.get(filePath);
     }
@@ -94,18 +90,17 @@ export async function createXianEngine({
          */
         strict,
 
-        /*
-         * Keep HTML escaping enabled.
-         */
+        
+        //Keep HTML escaping enabled. 
         noEscape: false,
       });
     } catch (error) {
       throw createTemplateError(error, filePath);
     }
 
-    /*
-     * Cache only when enabled.
-     */
+    
+    //Cache only when enabled.
+    
     if (cache) {
       templateCache.set(filePath, template);
     }
@@ -113,13 +108,8 @@ export async function createXianEngine({
     return template;
   }
 
-  /*
-   * ---------------------------------------------------------
-   * PRIORITY 5
-   *
-   * Render a layout around page content.
-   * ---------------------------------------------------------
-   */
+   // PRIORITY 5: Render a layout around page content.
+   
   async function renderLayout({ layoutName, body, options }) {
     const layoutPath = await resolveLayout(layoutsDirectory, layoutName);
 

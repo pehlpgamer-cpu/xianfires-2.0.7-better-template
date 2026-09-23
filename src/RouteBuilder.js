@@ -50,46 +50,10 @@ export class RouteBuilder {
             },
         };
 
-        const validHandlers = new Set(Object.keys(routes));
-
-        const include = new Set(handlers.include);
-        const exclude = new Set(handlers.exclude);
-
-
-        for (const handler of include) {
-        if (!validHandlers.has(handler)) {
-            throw new Error(`${handler} is invalid RouteBuilder resource method parameter`);
-        }
-        }
-
-
-        for (const handler of exclude) {
-        if (!validHandlers.has(handler)) {
-            throw new Error(`${handler} is invalid RouteBuilder resource method parameter`);
-        }
-        }
-
-    
-        const selectedHandlers = include.size > 0 ? new Set(include) : new Set(validHandlers);
-
-        // Remove excluded handlers
-        for (const handler of exclude) {
-        selectedHandlers.delete(handler);
-        }
-
-        for (const handler of selectedHandlers) {
-        const route = routes[handler];
-        const controllerHandler = controllerObject[handler];
-
-        if (typeof controllerHandler !== "function") {
-            throw new TypeError(`Controller method "${handler}" is required for resource "${uri}"`);
-        }
-
-        this.#router[route.method](route.uri, controllerHandler);
-        }
+        this.#assignHandlers(routes, controllerObject, handlers, "resource")
     }
 
-    apiResource( uri, controllerObject, handlers = { include: [], exclude: []}) 
+    apiResource(uri, controllerObject, handlers = { include: [], exclude: []}) 
     {
         const routes = {
             index: {
@@ -123,6 +87,11 @@ export class RouteBuilder {
             },
         };
 
+        this.#assignHandlers(routes, controllerObject, handlers, "apiResource")
+    }
+
+    #assignHandlers(routes, controllerObject, handlers, type)
+    {
         const validHandlers = new Set(Object.keys(routes));
 
         const include = new Set(handlers.include);
@@ -131,46 +100,34 @@ export class RouteBuilder {
 
         for (const handler of include) {
             if (!validHandlers.has(handler)) {
-                throw new Error(
-                    `${handler} is invalid RouteBuilder apiResource method parameter`,
-                );
+                throw new Error(`${handler} is invalid RouteBuilder resource method parameter`);
             }
         }
+
 
         for (const handler of exclude) {
             if (!validHandlers.has(handler)) {
-                throw new Error(
-                    `${handler} is invalid RouteBuilder apiResource method parameter`,
-                );
+                throw new Error(`${handler} is invalid RouteBuilder resource method parameter`);
             }
         }
 
-        
-        const selectedHandlers =
-            include.size > 0
-                ? new Set(include)
-                : new Set(validHandlers);
+    
+        const selectedHandlers = include.size > 0 ? new Set(include) : new Set(validHandlers);
 
-        
+        // Remove excluded handlers
         for (const handler of exclude) {
             selectedHandlers.delete(handler);
         }
 
-        // Register selected routes.
         for (const handler of selectedHandlers) {
             const route = routes[handler];
             const controllerHandler = controllerObject[handler];
 
             if (typeof controllerHandler !== "function") {
-                throw new TypeError(
-                    `Controller method "${handler}" is required for apiResource "${uri}"`,
-                );
+                throw new TypeError(`Controller method "${handler}" is required for ${type} "${uri}"`);
             }
 
-            this.#router[route.method](
-                route.uri,
-                controllerHandler,
-            );
+            this.#router[route.method](route.uri, controllerHandler);
         }
     }
 }

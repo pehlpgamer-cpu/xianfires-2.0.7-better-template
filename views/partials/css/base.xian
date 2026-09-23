@@ -1,0 +1,9 @@
+
+.bg-default {
+    background: linear-gradient(90deg, #f7a2a2 0%, #fcbe96 50%, #fee9af 100%);
+}
+
+.btn-default
+{
+    
+}

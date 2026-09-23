@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
 import { createXianEngine } from "./xian/index.js";
-import { registerRoutes } from "../routes/index.js";
+import { registerRoutes } from "../config/routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

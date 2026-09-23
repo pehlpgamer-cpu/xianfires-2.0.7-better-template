@@ -387,6 +387,18 @@ module.exports = {
         reachable: true,
       },
     },
+    {
+      name: "http/request - zod",
+      comment: "to make sure migration & connection works",
+      severity: "error",
+      module: {
+        path: "app/models",
+      },
+      to: {
+        path: "database/database.js",
+        reachable: true,
+      },
+    },
   ],
 };
 // generated: dependency-cruiser@17.4.3 on 2026-09-20T03:19:13.924Z

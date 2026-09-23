@@ -1,5 +1,5 @@
-import webRouter from "./web.js";
-import apiV1Router from "./api_v1.js";
+import webRouter from "../routes/web.js";
+import apiV1Router from "../routes/api_v1.js";
 
 export const routeGroups = Object.freeze([
   {
