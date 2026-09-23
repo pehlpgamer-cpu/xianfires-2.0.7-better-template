@@ -1,0 +1,11 @@
+{{>head}}
+
+<body class="bg-green-100">
+    <aside>
+        {{>sideNavBar}}
+    </aside>
+    <main>
+        {{{body}}}
+    </main>
+</body>
+</html>

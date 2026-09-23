@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { RouteBuilder } from "../app/utils/routing.js";
+import { RouteBuilder } from "../src/RouteBuilder.js";
 const routeBuilder = new RouteBuilder(router);
 
 import { homePage } from "../app/http/controllers/homeController.js";

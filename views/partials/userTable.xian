@@ -1,0 +1,27 @@
+<table class="table-auto border bg-white">
+    <thead>
+        <tr>
+            <th class="tableCell">Id</th>
+            <th class="tableCell">Username</th>
+            <th class="tableCell">Email</th>
+            <th class="tableCell">Role</th>
+            <th class="tableCell">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each users}}
+        <tr>
+            <td class="tableCell">{{id}}</td>
+            <td class="tableCell">{{username}}</td>
+            <td class="tableCell">{{email}}</td>
+            <td class="tableCell">{{role}}</td>
+            <td class="tableCell">delete/edit</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<style type="text/tailwindcss">
+    .tableCell {
+        @apply border p-1 
+    }
+</style>

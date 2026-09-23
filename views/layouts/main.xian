@@ -1,9 +1,26 @@
 {{>head}}
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col h-screen">
+    <nav class="bg-gray-100 border-b-1 p-2 gap-2 flex">
+        <a href="/" class="font-bold flex items-center text-xl hover:scale-110 duration-150 cursor-pointer">🔥XIANFIRE</a>
+        <div class="flex-1"></div>
+        <div class="flex gap-2">
+            <a href="/" class="btn">Home</a>
+            <a href="/login-page" class="btn">Login</a>
+            <a href="/register-page" class="btn">Register</a>
+            <a href="/users" class="btn">Users</a>
+        </div>
+    </nav>
     <main>
         {{{body}}}
     </main>
+    <div class="flex-1"></div>
     {{>footer}}
 </body>
 </html>
+
+<style type="text/tailwindcss">
+    .btn {
+        @apply cursor-pointer rounded p-2 bg-purple-300 hover:scale-105 hover:bg-black hover:text-white duration-150
+    } 
+</style>

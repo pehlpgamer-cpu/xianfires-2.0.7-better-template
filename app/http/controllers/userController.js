@@ -12,11 +12,38 @@ export default {
   index: async (req, res) => {
     const validated = getUserRequest(req);
 
-    const users = await User.findAll();
+    const users = [
+      {
+        id: 1,
+        username: "paulo",
+        email: "email.com",
+        role: "admin"
+      },
+      {
+        id: 12,
+        username: "bro",
+        email: "bro_mail.com",
+        role: "guest"
+      },
+      {
+        id: 321,
+        username: "chad",
+        email: "gigachad_mail.com",
+        role: "admin"
+      },
+      {
+        id: 1123,
+        username: "test",
+        email: "test_email.com",
+        role: "guest"
+      }
+    ]
+    //const users = await User.findAll();
 
     res.render("users", {
       pageTitle: "Users!!!",
-      products: users,
+      layout: "main",
+      users: users,
     });
   },
 
