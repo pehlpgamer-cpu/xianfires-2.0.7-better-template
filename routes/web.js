@@ -1,9 +1,14 @@
 import express from "express";
-import { homePage } from "../app/http/controllers/homeController.js";
 const router = express.Router();
-router.get("/", homePage);
+import { RouteBuilder } from "../app/utils/routing.js";
+const routeBuilder = new RouteBuilder(router);
 
-import { authController } from "../app/http/controllers/authController.js";
+import { homePage } from "../app/http/controllers/homeController.js";
+import userController from "../app/http/controllers/userController.js";
+import authController from "../app/http/controllers/authController.js";
+import auditTrailController from "../app/http/controllers/auditTrailController.js";
+
+router.get("/", homePage);
 
 router.get("/register-page", authController.registerPage);
 router.get("/forgot-password-page", authController.forgotPasswordPage);
@@ -14,10 +19,7 @@ router.post("/login", authController.login);
 router.post("/register", authController.register);
 router.get("/logout", authController.logout);
 
-import { productController } from "../app/http/controllers/productController.js";
 
-router.get("/products/:id", productController.show);
-router.get("/products", productController.index);
-router.post("/products", productController.store);
-
+routeBuilder.resource("/users", userController)
+routeBuilder.resource("/audit-trail", auditTrailController)
 export default router;

@@ -1,8 +1,9 @@
 import express from "express";
-import { homePage } from "../app/http/controllers/homeController.js";
 const router = express.Router();
-router.get("/test", (req, res) => {
-  res.json({ message: "api v1 test successful!" });
-});
+
+import healthController from "../app/http/controllers/api/v1/healthController.js";
+
+router.get("/up", healthController.up);
+router.get("/health", healthController.health);
 
 export default router;

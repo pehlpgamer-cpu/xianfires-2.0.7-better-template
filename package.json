@@ -15,6 +15,7 @@
     "migrate:drop": "node ./src/scripts/migrate/drop.js",
     "create:model": "node ./src/scripts/create/index.js model",
     "create:controller": "node ./src/scripts/create/index.js controller",
+    "create:request": "node ./src/scripts/create/index.js request",
     "route:list": "node ./src/scripts/list-routes.js",
     "route:cache": "node ./src/scripts/route-cache.js",
     "electron": "electron .",

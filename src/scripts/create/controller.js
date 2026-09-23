@@ -4,22 +4,52 @@ import { toCamelCase, toPascalCase, ensureDir } from "../utils.js";
 
 // Generate Express Controller (named exports)
 export const createController = async (controllerName) => {
-  const controllerDir = path.join(process.cwd(), "controllers");
+  const controllerDir = path.join(process.cwd(), "app/http/controllers");
   await ensureDir(controllerDir);
 
   const camelName = toCamelCase(controllerName); // e.g., userController
   const pascalModelName = toPascalCase(camelName.replace(/controller$/, "")); // e.g., User
-  const controllerPath = path.join(controllerDir, `${camelName}.js`);
+  const controllerPath = path.join(controllerDir, `${controllerName}.js`);
 
+  // TODO - fix generated model import name
   const controllerContent = `
-import { ${pascalModelName}, sequelize } from "../models/${pascalModelName}.js";
-await sequelize.sync();
-const ${camelName} ={
-  index: async (req, res) => {
-    res.send("Index Page");
+//import { ${pascalModelName}, sequelize } from "../../models/${pascalModelName}.js"; 
+
+export default {
+  show: async (req, res) => 
+  {
+    //
+  },
+  index: async (req, res) => 
+  {
+    //
+  },
+  store: async (req, res) => 
+  {
+    //
+  },
+  update: async (req, res) => 
+  {
+    //
+  },
+  replace: async (req, res) => 
+  {
+    //
+  },
+  destroy: async (req, res) => 
+  {
+    //
+  },
+  create: async (req, res) => 
+  {
+    //page
+  },
+  edit: async (req, res) => 
+  {
+    //page
   },
 };
-export { ${camelName} };
+
 `.trim();
 
   await fs.writeFile(controllerPath, controllerContent);

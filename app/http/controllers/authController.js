@@ -1,14 +1,14 @@
 import * as argon2 from "argon2";
 import { v4 as uuidv4 } from "uuid";
 import { argon2Config } from "../../../config/cryptography.js";
-import { User } from "../../models/User.js";
+import User from "../../models/User.js";
 import { loginRequest } from "../requests/auth/loginRequest.js";
 import { registerRequest } from "../requests/auth/registerRequest.js";
 
-export const authController = {
-  loginPage: (req, res) => res.render("auth/login", { pageTitle: "Login" }),
-  registerPage: (req, res) => res.render("auth/register", { pageTitle: "Register" }),
-  forgotPasswordPage: (req, res) =>
+export default {
+  loginPage: (_req, res) => res.render("auth/login", { pageTitle: "Login" }),
+  registerPage: (_req, res) => res.render("auth/register", { pageTitle: "Register" }),
+  forgotPasswordPage: (_req, res) =>
     res.render("auth/forgotpassword", { pageTitle: "Forgot Password" }),
 
   dashboardPage: (req, res) => {

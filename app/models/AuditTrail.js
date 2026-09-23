@@ -1,21 +1,18 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../database/database.js";
 
+//* WIP...
 export default sequelize.define(
-  "User",
+  "AuditTrail",
   {
-    name: {
+    oldData: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: {
+    newData: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+      allowNull: true,
+    }
   },
   {
     paranoid: true,

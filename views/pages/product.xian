@@ -1,5 +1,0 @@
-<section class="border bg-indigo-200 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 p-3 h-full gap-2">
-{{#each products}}
-    {{> product/productCard name=this.name price=this.price}}
-{{/each}}
-</section>

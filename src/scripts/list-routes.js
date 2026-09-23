@@ -16,18 +16,13 @@ const routerGroups = new Map(
 );
 
 function joinPaths(...parts) {
-  const result = parts
-    .filter(Boolean)
-    .join("/")
-    .replace(/\/+/g, "/");
+  const result = parts.filter(Boolean).join("/").replace(/\/+/g, "/");
 
   if (!result || result === "/") {
     return "/";
   }
 
-  return result.startsWith("/")
-    ? result
-    : `/${result}`;
+  return result.startsWith("/") ? result : `/${result}`;
 }
 
 function walk(stack, prefix = "", groupName = "default") {
@@ -38,16 +33,11 @@ function walk(stack, prefix = "", groupName = "default") {
         .map((method) => method.toUpperCase());
 
       const handler =
-        layer.route.stack
-          ?.map(
-            (entry) => entry.handle?.name ?? "anonymous",
-          )
-          .join(" → ") ?? "anonymous";
+        layer.route.stack?.map((entry) => entry.handle?.name ?? "anonymous").join(" → ") ??
+        "anonymous";
 
       const routePath =
-        typeof layer.route.path === "string"
-          ? layer.route.path
-          : String(layer.route.path);
+        typeof layer.route.path === "string" ? layer.route.path : String(layer.route.path);
 
       routes.push({
         group: groupName,
@@ -64,9 +54,7 @@ function walk(stack, prefix = "", groupName = "default") {
 
       walk(
         layer.handle.stack,
-        nestedGroup
-          ? joinPaths(prefix, nestedGroup.prefix)
-          : prefix,
+        nestedGroup ? joinPaths(prefix, nestedGroup.prefix) : prefix,
         nestedGroup?.name ?? groupName,
       );
     }
@@ -89,9 +77,7 @@ function parseArguments(argv) {
       const value = argv[index + 1];
 
       if (!value || value.startsWith("--")) {
-        throw new Error(
-          "Missing value for --group. Example: --group=api-v1",
-        );
+        throw new Error("Missing value for --group. Example: --group=api-v1");
       }
 
       groups.push(...value.split(","));
@@ -103,9 +89,7 @@ function parseArguments(argv) {
       const value = argument.slice("--group=".length);
 
       if (!value) {
-        throw new Error(
-          "Missing value for --group. Example: --group=api-v1",
-        );
+        throw new Error("Missing value for --group. Example: --group=api-v1");
       }
 
       groups.push(...value.split(","));
@@ -117,9 +101,7 @@ function parseArguments(argv) {
 
   return {
     help,
-    groups: groups
-      .map((group) => group.trim())
-      .filter(Boolean),
+    groups: groups.map((group) => group.trim()).filter(Boolean),
   };
 }
 
@@ -159,13 +141,7 @@ function getMethodStyle(method) {
 }
 
 function getGroupStyle(group) {
-  const styles = [
-    "cyan",
-    "blue",
-    "magenta",
-    "green",
-    "yellow",
-  ];
+  const styles = ["cyan", "blue", "magenta", "green", "yellow"];
 
   let hash = 0;
 
@@ -177,10 +153,7 @@ function getGroupStyle(group) {
 }
 
 try {
-  const {
-    help,
-    groups: groupFilters,
-  } = parseArguments(process.argv.slice(2));
+  const { help, groups: groupFilters } = parseArguments(process.argv.slice(2));
 
   if (help) {
     showHelp();
@@ -190,9 +163,7 @@ try {
   const applicationRouter = app._router;
 
   if (!applicationRouter?.stack) {
-    console.error(
-      "❌ Unable to inspect Express router stack.",
-    );
+    console.error("❌ Unable to inspect Express router stack.");
 
     process.exitCode = 1;
   } else {
@@ -202,55 +173,31 @@ try {
       groupFilters.length === 0
         ? routes
         : routes.filter((route) =>
-            groupFilters.some(
-              (group) =>
-                route.group.toLowerCase() ===
-                group.toLowerCase(),
-            ),
+            groupFilters.some((group) => route.group.toLowerCase() === group.toLowerCase()),
           );
 
-    const availableGroups = [
-      ...new Set(routes.map((route) => route.group)),
-    ];
+    const availableGroups = [...new Set(routes.map((route) => route.group))];
 
     const missingGroups = groupFilters.filter(
       (group) =>
         !availableGroups.some(
-          (availableGroup) =>
-            availableGroup.toLowerCase() ===
-            group.toLowerCase(),
+          (availableGroup) => availableGroup.toLowerCase() === group.toLowerCase(),
         ),
     );
 
     if (missingGroups.length > 0) {
-      console.error(
-        `❌ Unknown route group(s): ${missingGroups.join(", ")}`,
-      );
+      console.error(`❌ Unknown route group(s): ${missingGroups.join(", ")}`);
 
-      console.error(
-        `Available groups: ${
-          availableGroups.join(", ") || "none"
-        }`,
-      );
+      console.error(`Available groups: ${availableGroups.join(", ") || "none"}`);
 
       process.exitCode = 1;
     } else {
       console.log("");
 
-      console.log(
-        styleText(
-          ["bold", "underline"],
-          "🔥 XianFire — Registered Routes",
-        ),
-      );
+      console.log(styleText(["bold", "underline"], "🔥 XianFire — Registered Routes"));
 
       if (groupFilters.length > 0) {
-        console.log(
-          styleText(
-            "dim",
-            `Filtered groups: ${groupFilters.join(", ")}`,
-          ),
-        );
+        console.log(styleText("dim", `Filtered groups: ${groupFilters.join(", ")}`));
       }
 
       console.log("");
@@ -260,26 +207,12 @@ try {
       } else {
         const methodWidth = Math.max(
           6,
-          ...filteredRoutes.flatMap((route) =>
-            route.methods.map(
-              (method) => method.length,
-            ),
-          ),
+          ...filteredRoutes.flatMap((route) => route.methods.map((method) => method.length)),
         );
 
-        const pathWidth = Math.max(
-          4,
-          ...filteredRoutes.map(
-            (route) => route.path.length,
-          ),
-        );
+        const pathWidth = Math.max(4, ...filteredRoutes.map((route) => route.path.length));
 
-        const handlerWidth = Math.max(
-          7,
-          ...filteredRoutes.map(
-            (route) => route.handler.length,
-          ),
-        );
+        const handlerWidth = Math.max(7, ...filteredRoutes.map((route) => route.handler.length));
 
         let currentGroup = null;
 
@@ -289,11 +222,7 @@ try {
 
             console.log(
               `\n${styleText(
-                [
-                  "bold",
-                  "underline",
-                  getGroupStyle(route.group),
-                ],
+                ["bold", "underline", getGroupStyle(route.group)],
                 `[ ${route.group} ]`,
               )}`,
             );
@@ -301,48 +230,25 @@ try {
 
           const number = String(index + 1).padStart(3);
 
-          const methodText = route.methods
-            .map((method) =>
-              method.padEnd(methodWidth),
-            )
-            .join(", ");
+          const methodText = route.methods.map((method) => method.padEnd(methodWidth)).join(", ");
 
           const pathText = route.path.padEnd(pathWidth);
 
-          const handlerText = route.handler.padEnd(
-            handlerWidth,
-          );
+          const handlerText = route.handler.padEnd(handlerWidth);
 
-          const line =
-            `${number}  ` +
-            `${methodText}  ` +
-            `${pathText}  ` +
-            `${handlerText}`;
+          const line = `${number}  ` + `${methodText}  ` + `${pathText}  ` + `${handlerText}`;
 
-          const routeStyle = getMethodStyle(
-            route.methods[0] ?? "UNKNOWN",
-          );
+          const routeStyle = getMethodStyle(route.methods[0] ?? "UNKNOWN");
 
-          console.log(
-            styleText(routeStyle, line),
-          );
+          console.log(styleText(routeStyle, line));
         }
       }
 
-      console.log(
-        `\nTotal: ${filteredRoutes.length} route(s) registered\n`,
-      );
+      console.log(`\nTotal: ${filteredRoutes.length} route(s) registered\n`);
     }
   }
 } catch (error) {
-  console.error(
-    `❌ ${
-      error instanceof Error
-        ? error.message
-        : String(error)
-    }`,
-  );
+  console.error(`❌ ${error instanceof Error ? error.message : String(error)}`);
 
   process.exitCode = 1;
 }
-

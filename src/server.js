@@ -7,13 +7,9 @@ async function startServer() {
   await bootstrap();
 
   app.listen(PORT, () => {
-    console.log(
-      `🔥 XianFire running at http://localhost:${PORT}`,
-    );
+    console.log(`🔥 XianFire running at http://localhost:${PORT}`);
 
-    console.log(
-      `🔥 Xian environment: ${NODE_ENV}`,
-    );
+    console.log(`🔥 Xian environment: ${NODE_ENV}`);
   });
 }
 

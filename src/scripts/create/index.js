@@ -1,5 +1,6 @@
 import { createController } from "./controller.js";
 import { createModel } from "./model.js";
+import { createRequest } from "./request.js";
 
 const args = process.argv.slice(2);
 
@@ -28,6 +29,7 @@ const name = args[1]; // e.g., 'User' or 'userController'
   try {
     if (type === "model") await createModel(name);
     else if (type === "controller") await createController(name);
+    else if (type === "request") await createRequest(name)
     else {
       console.error('❌ Unknown type. Use "model" or "controller".');
       process.exit(1);

@@ -4,7 +4,8 @@ import { development, production } from "../../../config/database.js";
 import { sequelize } from "../../../database/database.js";
 
 // 🚨 CRITICAL: Import your models so they execute and register!
-import "../../../app/models/Product.js";
+import "../../../app/models/AuditTrail.js";
+import "../../../app/models/Role.js";
 import "../../../app/models/User.js";
 
 // Helper function to create the database if it doesn't exist
