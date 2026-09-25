@@ -1,7 +1,7 @@
 import { styleText } from "node:util";
 
 import app from "../app.js";
-import { routeGroups } from "../../config/routes.js";
+import { routeGroups } from "../../routes/routes.js";
 
 const routes = [];
 

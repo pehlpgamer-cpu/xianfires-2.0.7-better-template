@@ -3,10 +3,8 @@ import { styleText } from "node:util";
 import { development, production } from "../../../config/database.js";
 import { sequelize } from "../../../database/database.js";
 
-// 🚨 CRITICAL: Import your models so they execute and register!
-import "../../../app/models/AuditTrail.js";
-import "../../../app/models/Role.js";
-import "../../../app/models/User.js";
+//! 🚨 CRITICAL: Import your models so they execute and register!
+import "../../../app/models/index.js";
 
 // Helper function to create the database if it doesn't exist
 async function ensureDatabaseExists() {
@@ -59,11 +57,14 @@ export async function migrationCommand(sequelize, type) {
     if (type === "migrate") {
       await sequelize.sync();
       console.log("✅ Created all tables that doesn't exist");
-    } else if (type === "fresh") {
+    }
+    else if (type === "fresh") {
+      await sequelize.drop();
       await sequelize.sync({ force: true });
       console.log(styleText("red", "🗑️ Tables dropped for all models!"));
       console.log(styleText("green", "✅ Tables created for all models"));
-    } else if (type === "drop") {
+    } 
+    else if (type === "drop") {
       await sequelize.drop();
       console.log(styleText("red", "🗑️ Tables dropped for all models!"));
     }

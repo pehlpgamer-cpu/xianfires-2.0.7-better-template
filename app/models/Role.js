@@ -1,19 +1,30 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../../database/database.js";
 
-export default sequelize.define(
-  "Role",
-  {
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
+class Role extends Model {
+    static associate(models) {
+        Role.hasMany(models.User);
     }
-  },
-  {
-    paranoid: true,
-  },
+}
+
+export default Role.init(
+    {
+        roleId: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+        },
+
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+    },
+    {
+        paranoid: true,
+        sequelize,
+        modelName: "Role",
+        tableName: "roles",
+    }
 );
+

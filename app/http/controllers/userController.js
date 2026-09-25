@@ -6,7 +6,12 @@ import singleResourceRequest from "../requests/singleResourceRequest.js";
 import User from "../../models/User.js";
 export default {
   show: async (req, res) => {
-    const validated = singleResourceRequest(req);
+    // const validated = singleResourceRequest(req);
+    
+    const user = await User.findByPk(1, {
+        include: Role,
+    });
+    res.json({})
   },
 
   index: async (req, res) => {

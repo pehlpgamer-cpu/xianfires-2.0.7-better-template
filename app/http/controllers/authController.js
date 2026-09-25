@@ -4,12 +4,12 @@ import { argon2Config } from "../../../config/cryptography.js";
 import User from "../../models/User.js";
 import { loginRequest } from "../requests/auth/loginRequest.js";
 import { registerRequest } from "../requests/auth/registerRequest.js";
+import { sequelize } from "../../../database/database.js";
 
 export default {
   loginPage: (_req, res) => {return res.render("auth/login", { pageTitle: "Login" })},
   registerPage: (_req, res) => {return res.render("auth/register", { pageTitle: "Register" })},
-  forgotPasswordPage: (_req, res) =>
-    {return res.render("auth/forgotpassword", { pageTitle: "Forgot Password" })},
+  forgotPasswordPage: (_req, res) => {return res.render("auth/forgotpassword", { pageTitle: "Forgot Password" })},
 
   dashboardPage: (req, res) => {
     if (!req.session.userId) {return res.redirect("/login");}
@@ -37,14 +37,22 @@ export default {
     const pepper = process.env.SECRET_KEY;
     const hashPassword = await argon2.hash(password + salt + pepper, argon2Config);
 
-    const user = await User.create({
-      name: validData.name,
-      email: validData.email,
-      password: hashPassword,
-      salt: salt,
-    });
-    req.session.userId = user.id;
-    res.redirect("/dashboard");
+    try {
+      const _result = await sequelize.transaction(async t => {
+        const user = await User.create({
+          username: validData.name,
+          email: validData.email,
+          password: hashPassword,
+          salt: salt,
+        });
+      })
+      req.session.userId = user.id;
+      res.redirect("/dashboard");
+    }
+    catch (error) {
+      console.error("⚠️ TRANSACTION: " + error)
+    }
+    
   },
 
   logout: (req, res) => {

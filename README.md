@@ -106,12 +106,13 @@ $extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "s
   - `dependency-cruiser` https://www.npmjs.com/package/dependency-cruiser
 
 # Current Issues
-
+- ⚠️ Sequelize ORM
+  - migration scripts.
+  - database seeder.
 - no template creation script (need to do manual config).
 - Electron implementation.
 - Incomplete docs.
 - Auth & Product logic.
-- database seeder.
 - no ratelimit.
 - `npm run create:` is incomplete & messy.
 - `./tests` examples and unsure if it works w/out problem.
