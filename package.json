@@ -28,10 +28,10 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "test": "node bin/test.js; npm run test:dep",
-    "test:dep": "npm run test:dep:quick; npm run test:dep:report; npm run test:dep:matrix;",
-    "test:dep:quick": "npx dependency-cruiser app database routes tests config src",
-    "test:dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests config src",
-    "test:dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests config src"
+    "dep:check": "npx dependency-cruiser app database routes tests config src",
+    "dep:svg": "npx dependency-cruiser src app views routes database config --output-type dot | dot -T svg > dependency-graph.svg",
+    "dep:report": "npx dependency-cruiser --config --output-type err-html -f dependency-report.html app database routes tests config src",
+    "dep:matrix": "npx dependency-cruiser -T html -f dependency-matrix.html app database routes tests config src"
   },
   "dependencies": {
     "argon2": "^0.45.1",
@@ -39,6 +39,7 @@
     "chokidar": "^5.0.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^17.4.2",
+    "editorconfig": "^3.0.2",
     "express": "^4.19.2",
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
@@ -61,6 +62,7 @@
     "dependency-cruiser": "^17.4.3",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
+    "lint-staged": "^17.5.1",
     "nodemon": "^3.1.14",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",

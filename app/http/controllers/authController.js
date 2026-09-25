@@ -6,13 +6,13 @@ import { loginRequest } from "../requests/auth/loginRequest.js";
 import { registerRequest } from "../requests/auth/registerRequest.js";
 
 export default {
-  loginPage: (_req, res) => res.render("auth/login", { pageTitle: "Login" }),
-  registerPage: (_req, res) => res.render("auth/register", { pageTitle: "Register" }),
+  loginPage: (_req, res) => {return res.render("auth/login", { pageTitle: "Login" })},
+  registerPage: (_req, res) => {return res.render("auth/register", { pageTitle: "Register" })},
   forgotPasswordPage: (_req, res) =>
-    res.render("auth/forgotpassword", { pageTitle: "Forgot Password" }),
+    {return res.render("auth/forgotpassword", { pageTitle: "Forgot Password" })},
 
   dashboardPage: (req, res) => {
-    if (!req.session.userId) return res.redirect("/login");
+    if (!req.session.userId) {return res.redirect("/login");}
     res.render("dashboard", { pageTitle: "Dashboard" });
   },
 
@@ -20,7 +20,7 @@ export default {
     const { email, password } = loginRequest(req);
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.send("User not found");
+    if (!user) {return res.send("User not found");}
     //const match = await argon2.compare(password, user.password);
     if (!match) {
       return res.send("Incorrect password");

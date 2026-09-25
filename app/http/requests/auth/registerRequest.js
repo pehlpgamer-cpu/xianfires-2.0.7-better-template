@@ -20,6 +20,6 @@ export const registerRequest = (req) => {
     Register.parse(data);
     return data;
   } catch (error) {
-    if (error instanceof z.ZodError) return { error: error.issues };
+    if (error instanceof z.ZodError) {return { error: error.issues };}
   }
 };

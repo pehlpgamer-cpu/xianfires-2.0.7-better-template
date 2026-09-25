@@ -5,6 +5,6 @@ export default (req) => {
     resource.parse(data);
     return data;
   } catch (error) {
-    if (error instanceof z.ZodError) return error.issues;
+    if (error instanceof z.ZodError) {return error.issues;}
   }
 };

@@ -27,9 +27,9 @@ const name = args[1]; // e.g., 'User' or 'userController'
 // Run based on type
 (async () => {
   try {
-    if (type === "model") await createModel(name);
-    else if (type === "controller") await createController(name);
-    else if (type === "request") await createRequest(name)
+    if (type === "model") {await createModel(name);}
+    else if (type === "controller") {await createController(name);}
+    else if (type === "request") {await createRequest(name)}
     else {
       console.error('❌ Unknown type. Use "model" or "controller".');
       process.exit(1);

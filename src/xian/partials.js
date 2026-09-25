@@ -1,9 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-/**
- * Determines whether a file is a Xian template.
- */
+// Determines whether a file is a Xian template.
 function isXianFile(fileName) {
   return fileName.endsWith(".xian");
 }
@@ -12,11 +10,9 @@ function isXianFile(fileName) {
  * Converts a filesystem path into a Handlebars partial name.
  *
  * Example:
- *
  * views/partials/components/button.xian
  *
  * becomes:
- *
  * components/button
  */
 function createPartialName(baseDirectory, filePath) {
@@ -28,9 +24,7 @@ function createPartialName(baseDirectory, filePath) {
     .join("/");
 }
 
-/**
- * Recursively discovers every .xian file.
- */
+// Recursively discovers every .xian file.
 export async function findPartialFiles(directory) {
   const entries = await fs.readdir(directory, {
     withFileTypes: true,
@@ -57,22 +51,16 @@ export async function findPartialFiles(directory) {
   return files;
 }
 
-/**
- * Registers one partial.
- */
+// Registers one partial. (FOR WATCHER)
 export async function registerPartial(handlebars, partialsDirectory, filePath) {
   const content = await fs.readFile(filePath, "utf8");
-
   const partialName = createPartialName(partialsDirectory, filePath);
-
   handlebars.registerPartial(partialName, content);
-
   return partialName;
 }
 
-/**
- * Recursively registers all Xian partials.
- */
+
+// Recursively registers all Xian partials. (FOR ENGINE) 
 export async function registerPartials(handlebars, partialsDirectory) {
   const files = await findPartialFiles(partialsDirectory);
 
@@ -83,9 +71,7 @@ export async function registerPartials(handlebars, partialsDirectory) {
   return files;
 }
 
-/**
- * Removes a partial from the Handlebars instance.
- */
+// Removes a partial from the Handlebars instance. (FOR WATCHER)
 export function unregisterPartial(handlebars, partialsDirectory, filePath) {
   const partialName = createPartialName(partialsDirectory, filePath);
 
