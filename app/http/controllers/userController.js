@@ -3,14 +3,10 @@ import updateUserRequest from "../requests/user/updateUserRequest.js";
 import getUserRequest from "../requests/user/getUserRequest.js";
 import singleResourceRequest from "../requests/singleResourceRequest.js";
 
-import User from "../../models/User.js";
 export default {
   show: async (req, res) => {
     // const validated = singleResourceRequest(req);
     
-    const user = await User.findByPk(1, {
-        include: Role,
-    });
     res.json({})
   },
 
@@ -54,9 +50,7 @@ export default {
 
   store: async (req, res) => {
     const validated = storeUserRequest(req);
-    // const User = await User.create({
-    //   //...
-    // });
+  
     res.json({ id: product.id }).status(201);
   },
 
