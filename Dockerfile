@@ -1,15 +1,20 @@
-FROM node:24
+# PRODUCTION 
+FROM node:24-bookworm-slim
 
 WORKDIR /app
 
-COPY package*.json ./
+ENV NODE_ENV=production
 
-RUN npm install
+COPY package.json package-lock.json ./
+
+RUN npm ci --omit=dev
 
 COPY . .
 
-ENV PORT=9000
+RUN chown -R node:node /app
 
-EXPOSE 9000
+USER node
 
-CMD ["npm", "start"]
+EXPOSE 3000
+
+CMD ["node", "src/app.js"]

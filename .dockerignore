@@ -2,3 +2,4 @@ node_modules
 docs
 tests
 electron
+.dockerignore

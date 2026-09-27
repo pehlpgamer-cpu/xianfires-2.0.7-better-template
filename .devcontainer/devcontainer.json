@@ -1,0 +1,36 @@
+{
+    "name": "Better XianFire - Development",
+
+    "dockerComposeFile": "../compose.yaml",
+    "service": "devcontainer",
+
+    "workspaceFolder": "/workspace",
+
+    "remoteUser": "node",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "oxc.oxc-vscode",
+                "austenc.tailwind-docs",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+
+    "postCreateCommand": "npm ci",
+
+    "forwardPorts": [
+        3000
+    ],
+
+    "portsAttributes": {
+        "3000": {
+            "label": "XianFire",
+            "onAutoForward": "notify"
+        }
+    },
+
+    "shutdownAction": "stopCompose"
+}

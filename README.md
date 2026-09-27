@@ -3,6 +3,33 @@
 
 > An improved version of XainFire framework that follows best practices, provides better examples & includes modern packages to improve developer experience while still being very similar to the original.
 
+# Docker (WIP...)
+```bash
+# Dev
+docker compose up
+```
+```bash
+git clone YOUR_REPOSITORY
+cd xianfires-2.0.7-better-template
+
+nano .env.production
+
+docker compose -f compose.prod.yaml up -d --build
+
+#check
+docker compose -f compose.prod.yaml ps
+docker compose -f compose.prod.yaml logs -f app
+
+# Update vps
+git pull
+docker compose -f compose.prod.yaml build app
+docker compose -f compose.prod.yaml up -d --no-deps app
+
+# migrations
+docker compose -f compose.prod.yaml exec app <your-drizzle-migration-command>
+```
+
+
 # Quick Start
 
 1. Open `terminal` or `powershell` app.
