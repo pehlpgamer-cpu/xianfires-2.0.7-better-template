@@ -1,32 +1,41 @@
 services:
 
-  app:
+  devcontainer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: .devcontainer/Dockerfile
 
-    restart: unless-stopped
+    working_dir: /workspace
+
+    command: sleep infinity
 
     init: true
 
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules
+
     environment:
-      NODE_ENV: production
-      ENV: production
+      NODE_ENV: development
+      ENV: development
       PORT: ${PORT:-3000}
 
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
 
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE is required}
-      DB_USER: ${MYSQL_USER:?MYSQL_USER is required}
+      DB_DATABASE: ${MYSQL_DATABASE:-xianfire}
+      DB_USER: ${MYSQL_USER:-xianfire}
       DB_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
 
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@example.com}
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@xianfire.local}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-XianFire}
 
       FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
@@ -46,36 +55,8 @@ services:
       redis:
         condition: service_healthy
 
-    ports:
-      - "3000:3000"
-
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "node -e \"fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-    read_only: true
-
-    tmpfs:
-      - /tmp
-
-    cap_drop:
-      - ALL
-
-    security_opt:
-      - no-new-privileges:true
-
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "5"
+      mailpit:
+        condition: service_started
 
   mysql:
     image: mysql:8.4
@@ -83,13 +64,16 @@ services:
     restart: unless-stopped
 
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE is required}
-      MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-xianfire}
+      MYSQL_USER: ${MYSQL_USER:-xianfire}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
 
+    ports:
+      - "127.0.0.1:3306:3306"
+
     volumes:
-      - mysql_data:/var/lib/mysql
+      - xianfire_mysql_data:/var/lib/mysql
 
     healthcheck:
       test:
@@ -102,12 +86,6 @@ services:
       retries: 20
       start_period: 15s
 
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "5"
-
   redis:
     image: redis:7-alpine
 
@@ -118,8 +96,11 @@ services:
       - --appendonly
       - "yes"
 
+    ports:
+      - "127.0.0.1:6379:6379"
+
     volumes:
-      - redis_data:/data
+      - xianfire_redis_data:/data
 
     healthcheck:
       test:
@@ -133,12 +114,16 @@ services:
       retries: 10
       start_period: 5s
 
-    logging:
-      driver: local
-      options:
-        max-size: "10m"
-        max-file: "5"
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+
+    restart: unless-stopped
+
+    ports:
+    - "127.0.0.1:8025:8025"
+    - "127.0.0.1:1025:1025"
 
 volumes:
-  mysql_data:
-  redis_data:
+  node_modules:
+  xianfire_mysql_data:
+  xianfire_redis_data:

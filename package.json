@@ -8,6 +8,8 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
+    "env:prod": "Copy-Item .env.production.example .env.production",
+    "env:dev": "Copy-Item .env.development.example .env",
     "start": "node ./src/server.js",
     "xian": "nodemon ./src/server.js",
     "migrate": "node ./src/scripts/migrate/migrate.js",

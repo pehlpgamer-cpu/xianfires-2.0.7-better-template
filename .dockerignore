@@ -1,5 +1,48 @@
-node_modules
-docs
-tests
-electron
-.dockerignore
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+!.env.development.example
+!.env.production.example
+
+# Git
+.git/
+.gitignore
+
+# Dev Container
+.devcontainer/
+
+# Compose files
+compose.dev.yaml
+compose.prod.yaml
+
+# Documentation
+docs/
+
+# Tests
+tests/
+coverage/
+.playwright/
+test-results/
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Unrelated application components
+electron/

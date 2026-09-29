@@ -4,94 +4,71 @@
 > An improved version of XainFire framework that follows best practices, provides better examples & includes modern packages to improve developer experience while still being very similar to the original.
 
 # Docker (WIP...)
+## DEV
 ```bash
-# Dev
-docker compose up
+# Check Compose configuration
+docker compose -f compose.dev.yaml config
+
+# Start
+docker compose -f compose.dev.yaml up -d
+
+# Verify containers
+docker compose -f compose.dev.yaml ps
 ```
+
+### Inside the Dev Container
 ```bash
-git clone YOUR_REPOSITORY
-cd xianfires-2.0.7-better-template
-
-nano .env.production
-
-docker compose -f compose.prod.yaml up -d --build
-
-#check
-docker compose -f compose.prod.yaml ps
-docker compose -f compose.prod.yaml logs -f app
-
-# Update vps
-git pull
-docker compose -f compose.prod.yaml build app
-docker compose -f compose.prod.yaml up -d --no-deps app
-
-# migrations
-docker compose -f compose.prod.yaml exec app <your-drizzle-migration-command>
+# Start the development server
+npm run dev
 ```
 
+### Useful DEV commands
+```bash
+# View logs
+docker compose -f compose.dev.yaml logs -f
 
-# Quick Start
+# Rebuild and start
+docker compose -f compose.dev.yaml up -d --build
 
-1. Open `terminal` or `powershell` app.
-2. verify if NodeJS is installed
+# Stop
+docker compose -f compose.dev.yaml down
+```
+
+## PROD (⚠️WIP & untested)
 
 ```powershell
-node -v; # must print "v24.21.0" or any version in terminal
+# Create the real production environment file
+Copy-Item .env.production.example .env.production
+
+# Verify it exists
+Test-Path .env.production
 ```
 
-3. if node is not installed
-   [download node LTS v24.21.0](https://nodejs.org/dist/v24.21.0/node-v24.21.0-x64.msi)
+### Check configuration
+```bash
+# Check the resolved Compose configuration
+docker compose --env-file .env.production -f compose.prod.yaml config
 
-4. copy n paste command, change name if needed & enter.
-
-```powershell
-$projectName = "my-xianfire-enhanced-app";
+# Check Compose interpolation environment
+docker compose --env-file .env.production -f compose.prod.yaml config --environment
+Start
+docker compose --env-file .env.production -f compose.prod.yaml up -d --build
+Verify
+docker compose --env-file .env.production -f compose.prod.yaml ps
+Logs
+docker compose --env-file .env.production -f compose.prod.yaml logs -f
 ```
 
-5. copy, paste & enter command.
-   - cd to Desktop.
-   - make & cd to project folder.
-   - git clone template.
-   - executes `npm i`.
-   - creates git repo & commit.
-   - opens project in vscode.
+### Useful PROD commands
+```bash
+# Rebuild and restart
+docker compose --env-file .env.production -f compose.prod.yaml up -d --build
 
-```powershell
-cd "$env:USERPROFILE\Desktop"; mkdir $projectName; cd $projectName; git clone https://github.com/pehlpgamer-cpu/xianfires-2.0.7-better-template .; Write-Host "`ngit clone ✅completed" -ForegroundColor Green; [Console]::Beep(2000, 200); [Console]::Beep(2000, 200); npm i; Write-Host "`nnpm i ✅completed`n" -ForegroundColor Green; [Console]::Beep(2000, 200); [Console]::Beep(2000, 200); Remove-Item -Recurse -Force .git; git init; git add .; git commit -m "1st"; code .; exit;
-```
+# Stop
+docker compose --env-file .env.production -f compose.prod.yaml down
 
-## VScode setup
-
-1. Open VS Code
-2. Press Ctrl + , (Windows/Linux) or Cmd + , (Mac) to open Settings
-3. Click the "Open Settings (JSON)" icon in the top right (looks like a file with curly braces {})
-4. Add or merge this snippet into your settings.json:
-
-```json
-{
-  "files.associations": {
-    "*.xian": "html"
-  }
-}
-```
-
-5. Vsocde extentions (semi-optional)
-
-- error lens
-- dotenv
-- oxc (oxlint & oxfmt)
-- material icon theme
-- path intellisense
-- html hint
-- highlight matching tag
-- indent rainbow
-- spell checker
-- auto close tag
-- fallow
-- better comments
-
-```powershell
-$extensions = @("usernamehw.errorlens", "mikestead.dotenv", "oxc.oxc-vscode", "stivo.tailwind-fold", "bradlc.vscode-tailwindcss", "pkief.material-icon-theme", "christian-kohler.path-intellisense", "htmlhint.vscode-htmlhint", "vincaslt.highlight-matching-tag", "oderwat.indent-rainbow", "streetsidesoftware.code-spell-checker", "formulahendry.auto-close-tag", "fallow-rs.fallow-vscode", "aaron-bond.better-comments"); $installed = code --list-extensions; $extensions | Where-Object { $_ -notin $installed } | ForEach-Object { code --install-extension $_; [Console]::Beep(2000, 200); [Console]::Beep(2000, 200)}
+# Check configuration again
+docker compose --env-file .env.production -f compose.prod.yaml config
 ```
 
 # Documentation

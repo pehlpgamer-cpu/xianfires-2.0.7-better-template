@@ -1,7 +1,7 @@
 {
-    "name": "Better XianFire - Development",
+    "name": "XianFire Development",
 
-    "dockerComposeFile": "../compose.yaml",
+    "dockerComposeFile": "../compose.dev.yaml",
     "service": "devcontainer",
 
     "workspaceFolder": "/workspace",
@@ -11,10 +11,28 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "dbaeumer.vscode-eslint",
                 "oxc.oxc-vscode",
+                "redis.redis-for-vscode",
+                "fallow-rs.fallow-vscode",
+                "xabikos.javascriptsnippets",
+                "crystal-spider.jsdoc-generator",
+
+                "bradlc.vscode-tailwindcss",
                 "austenc.tailwind-docs",
-                "ms-azuretools.vscode-docker"
+                "stivo.tailwind-fold",
+
+                "vincaslt.highlight-matching-tag",
+                "ms-playwright.playwright",
+                "htmlhint.vscode-htmlhint",
+
+                "usernamehw.errorlens",
+                "aaron-bond.better-comments",
+                "streetsidesoftware.code-spell-checker",
+                "dotenv.dotenv-vscode",
+                "christian-kohler.path-intellisense",
+                "oderwat.indent-rainbow",
+                "fill-labs.dependi",
+                "redhat.vscode-yaml"
             ]
         }
     },
@@ -22,12 +40,17 @@
     "postCreateCommand": "npm ci",
 
     "forwardPorts": [
-        3000
+        3000,
+        8025
     ],
 
     "portsAttributes": {
         "3000": {
             "label": "XianFire",
+            "onAutoForward": "notify"
+        },
+        "8025": {
+            "label": "Mailpit Web UI",
             "onAutoForward": "notify"
         }
     },

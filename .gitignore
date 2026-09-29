@@ -1,27 +1,41 @@
-
-COMMIT_MESSAGE.md
-
-coverage
-build
-dist
-test/__app
-backup
-
-dependency-matrix.html
-dependency-report.html
-dependency-graph.svg
-
+# Dependencies
 node_modules/
 
+# Environment files
 .env
 .env.*
 !.env.example
+!.env.development.example
 !.env.production.example
 
+# Logs
+*.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
+# Coverage
+coverage/
 
-.vscode/
+# Test artifacts
+.playwright/
+test-results/
+blob-report/
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Docker / local development
+docker-data/
+
+# Build artifacts
+dist/
+build/
+
+# Misc
+*.tmp
+*.temp
