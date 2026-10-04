@@ -1,11 +1,8 @@
 {
     "name": "XianFire Development",
-
     "dockerComposeFile": "../compose.dev.yaml",
     "service": "devcontainer",
-
     "workspaceFolder": "/workspace",
-
     "remoteUser": "node",
 
     "customizations": {
@@ -20,7 +17,6 @@
                 "bradlc.vscode-tailwindcss",
                 "austenc.tailwind-docs",
                 "stivo.tailwind-fold",
-
                 "vincaslt.highlight-matching-tag",
                 "ms-playwright.playwright",
                 "htmlhint.vscode-htmlhint",
@@ -40,17 +36,12 @@
     "postCreateCommand": "npm ci",
 
     "forwardPorts": [
-        3000,
-        8025
+        3000
     ],
 
     "portsAttributes": {
         "3000": {
-            "label": "XianFire",
-            "onAutoForward": "notify"
-        },
-        "8025": {
-            "label": "Mailpit Web UI",
+            "label": "Backend",
             "onAutoForward": "notify"
         }
     },

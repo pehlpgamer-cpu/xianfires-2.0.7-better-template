@@ -3,10 +3,7 @@ node_modules/
 
 # Environment files
 .env
-.env.*
-!.env.example
-!.env.development.example
-!.env.production.example
+!.env.*
 
 # Logs
 *.log
@@ -24,6 +21,7 @@ blob-report/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.follow
 
 # OS
 .DS_Store

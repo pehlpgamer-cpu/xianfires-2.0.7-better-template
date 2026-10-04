@@ -1,85 +1,58 @@
 services:
-
   devcontainer:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-
-    working_dir: /workspace
-
-    command: sleep infinity
-
+    image: node:24
     init: true
+    user: node
+    working_dir: /workspace
+    command: sleep infinity
 
     volumes:
       - .:/workspace
-      - node_modules:/workspace/node_modules
+      - node_modules:/workspace/node_modules # best practice (behavior consistency & performance)
+
+    ports:
+      - "${PORT}:${PORT}"
 
     environment:
       NODE_ENV: development
-      ENV: development
-      PORT: ${PORT:-3000}
+      PORT: ${PORT}
 
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
-
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: ${MYSQL_DATABASE:-xianfire}
-      DB_USER: ${MYSQL_USER:-xianfire}
-      DB_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-
-      MAIL_HOST: mailpit
-      MAIL_PORT: 1025
-
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@xianfire.local}
-      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-XianFire}
-
-      FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
-      FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}
-      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
-
-      ARGON2_TYPE: ${ARGON2_TYPE:-2}
-      ARGON2_TIME_COST: ${ARGON2_TIME_COST:-2}
-      ARGON2_MEMORY_COST: ${ARGON2_MEMORY_COST:-19456}
-      ARGON2_PARALLELISM: ${ARGON2_PARALLELISM:-1}
-      ARGON2_HASH_LENGTH: ${ARGON2_HASH_LENGTH:-32}
 
     depends_on:
       mysql:
         condition: service_healthy
-
       redis:
         condition: service_healthy
 
-      mailpit:
-        condition: service_started
-
   mysql:
-    image: mysql:8.4
-
+    image: mysql:8.4 # 26.7.0 is not a valid version --> https://hub.docker.com/_/mysql/tags?name=8.4&utm_source=chatgpt.com
     restart: unless-stopped
 
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-xianfire}
-      MYSQL_USER: ${MYSQL_USER:-xianfire}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
     ports:
-      - "127.0.0.1:3306:3306"
+      - "3306:3306"
 
     volumes:
-      - xianfire_mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
 
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"
         ]
       interval: 5s
       timeout: 5s
@@ -87,43 +60,20 @@ services:
       start_period: 15s
 
   redis:
-    image: redis:7-alpine
-
-    restart: unless-stopped
-
-    command:
-      - redis-server
-      - --appendonly
-      - "yes"
-
-    ports:
-      - "127.0.0.1:6379:6379"
+    image: redis:8.10.2
 
     volumes:
-      - xianfire_redis_data:/data
+      - redis-data:/data
 
     healthcheck:
       test:
-        [
-          "CMD",
-          "redis-cli",
-          "ping"
-        ]
+        ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
-      retries: 10
-      start_period: 5s
-
-  mailpit:
-    image: axllent/mailpit:v1.31.3
-
-    restart: unless-stopped
-
-    ports:
-    - "127.0.0.1:8025:8025"
-    - "127.0.0.1:1025:1025"
+      retries: 5
+      start_period: 10s
 
 volumes:
   node_modules:
-  xianfire_mysql_data:
-  xianfire_redis_data:
+  mysql_data:
+  redis-data:

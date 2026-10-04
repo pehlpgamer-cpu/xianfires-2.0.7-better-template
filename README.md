@@ -4,72 +4,9 @@
 > An improved version of XainFire framework that follows best practices, provides better examples & includes modern packages to improve developer experience while still being very similar to the original.
 
 # Docker (WIP...)
-## DEV
-```bash
-# Check Compose configuration
-docker compose -f compose.dev.yaml config
 
-# Start
-docker compose -f compose.dev.yaml up -d
 
-# Verify containers
-docker compose -f compose.dev.yaml ps
-```
 
-### Inside the Dev Container
-```bash
-# Start the development server
-npm run dev
-```
-
-### Useful DEV commands
-```bash
-# View logs
-docker compose -f compose.dev.yaml logs -f
-
-# Rebuild and start
-docker compose -f compose.dev.yaml up -d --build
-
-# Stop
-docker compose -f compose.dev.yaml down
-```
-
-## PROD (⚠️WIP & untested)
-
-```powershell
-# Create the real production environment file
-Copy-Item .env.production.example .env.production
-
-# Verify it exists
-Test-Path .env.production
-```
-
-### Check configuration
-```bash
-# Check the resolved Compose configuration
-docker compose --env-file .env.production -f compose.prod.yaml config
-
-# Check Compose interpolation environment
-docker compose --env-file .env.production -f compose.prod.yaml config --environment
-Start
-docker compose --env-file .env.production -f compose.prod.yaml up -d --build
-Verify
-docker compose --env-file .env.production -f compose.prod.yaml ps
-Logs
-docker compose --env-file .env.production -f compose.prod.yaml logs -f
-```
-
-### Useful PROD commands
-```bash
-# Rebuild and restart
-docker compose --env-file .env.production -f compose.prod.yaml up -d --build
-
-# Stop
-docker compose --env-file .env.production -f compose.prod.yaml down
-
-# Check configuration again
-docker compose --env-file .env.production -f compose.prod.yaml config
-```
 
 # Documentation
 
